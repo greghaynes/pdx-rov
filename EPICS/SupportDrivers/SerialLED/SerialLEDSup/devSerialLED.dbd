@@ -1,0 +1,16 @@
+device(ai,        GPIB_IO, devAiSerialLED,    "SerialLED")
+device(ao,        GPIB_IO, devAoSerialLED,    "SerialLED")
+device(bi,        GPIB_IO, devBiSerialLED,    "SerialLED")
+device(bo,        GPIB_IO, devBoSerialLED,    "SerialLED")
+device(event,     GPIB_IO, devEvSerialLED,    "SerialLED")
+device(longin,    GPIB_IO, devLiSerialLED,    "SerialLED")
+device(longout,   GPIB_IO, devLoSerialLED,    "SerialLED")
+device(mbbi,      GPIB_IO, devMbbiSerialLED , "SerialLED")
+device(mbbiDirect,GPIB_IO, devMbbidSerialLED, "SerialLED")
+device(mbbo,      GPIB_IO, devMbboSerialLED,  "SerialLED")
+device(mbboDirect,GPIB_IO, devMbbodSerialLED, "SerialLED")
+device(stringin,  GPIB_IO, devSiSerialLED,    "SerialLED")
+device(stringout, GPIB_IO, devSoSerialLED,    "SerialLED")
+device(waveform,  GPIB_IO, devWfSerialLED,    "SerialLED")
+
+include "asyn.dbd"
