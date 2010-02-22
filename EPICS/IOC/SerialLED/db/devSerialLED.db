@@ -1,0 +1,6 @@
+record(longout, "$(P)$(R)LedOn")
+{
+    field(DESC, "Output completion status")
+    field(DTYP, "SerialLED")
+    field(out,  "#L$(L) A$(A) @1")
+}

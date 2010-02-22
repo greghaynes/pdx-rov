@@ -1,0 +1,5 @@
+device(ai,        GPIB_IO, devAiSerialLED,    "SerialLED")
+device(longout,  GPIB_IO, devLoSerialLED,    "SerialLED")
+
+include "asyn.dbd"
+
