@@ -1,9 +1,10 @@
 #include <QApplication>
-#include "qjoystick.h"
+#include "joystickmanagerwindow.h"
 
 int main(int argc, char ** argv)
 {
 	QApplication app( argc, argv );
-	QJoystick stick("/dev/input/js0");
+	JoystickManagerWindow window;
+	window.setVisible(true);
 	return app.exec();
 }

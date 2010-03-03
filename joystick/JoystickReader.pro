@@ -8,5 +8,5 @@ UI_DIR = build
 LIBS +=
 LIBS+=
 FORMS = ui/mainwindow.ui
-HEADERS = src/qjoystick.h
-SOURCES = src/qjoystick.cpp src/main.cpp
+HEADERS = src/qjoystick.h src/joystickmanagerwindow.h
+SOURCES = src/qjoystick.cpp src/joystickmanagerwindow.cpp src/main.cpp
