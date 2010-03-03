@@ -3,7 +3,6 @@
 //
 #include <QMainWindow>
 #include <QTimer>
-#include "joystick.h"
 #include "ui_mainwindow.h"
 //
 class MainWindowImpl : public QMainWindow, public Ui::MainWindow

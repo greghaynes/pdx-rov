@@ -2,10 +2,8 @@
 #define Q_JOYSTICK_H
 
 #include <QObject>
-#include <QFileSystemWatcher>
-
-#include <joystick.h>
-#include <joystick.cpp>
+#include <QString>
+#include <QSocketNotifier>
 
 class QJoystick
   : public QObject
@@ -15,11 +13,12 @@ class QJoystick
 	public:
 		enum EventType
 		{
-		  BUTTON,
-		  AXES
+			Button,
+			Axis,
+			Init,
 		};
 
-		QJoystick(const QUrl &path, QObject *parent = 0);
+		QJoystick(const QString &path, QObject *parent = 0);
 		QString name();
 		QString device();
 		int numButtons();
@@ -32,11 +31,11 @@ class QJoystick
 			short int value);
 
 	private Q_SLOTS:
-		void onChanged(const QString &path);
+		void activated(int);
   
 	private:
-		QFileSystemWatcher *filesysWatcher;
+		QSocketNotifier *socketNotifier;
 
 };
 
-#endif Q_JOYSTICK_H
+#endif

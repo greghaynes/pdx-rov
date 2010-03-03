@@ -1,11 +1,9 @@
 #include <QApplication>
-#include "mainwindowimpl.h"
-//
+#include "qjoystick.h"
+
 int main(int argc, char ** argv)
 {
 	QApplication app( argc, argv );
-	MainWindowImpl win;
-	win.show(); 
-	app.connect( &app, SIGNAL( lastWindowClosed() ), &app, SLOT( quit() ) );
+	QJoystick stick("/dev/input/js0");
 	return app.exec();
 }
