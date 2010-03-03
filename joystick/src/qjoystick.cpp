@@ -38,7 +38,7 @@ int QJoystick::numButtons()
 	return 0;
 }
 
-int QJoystick::numAxes()
+int QJoystick::numAxis()
 {
 	return 0;
 }

@@ -22,7 +22,7 @@ class QJoystick
 		QString name();
 		QString device();
 		int numButtons();
-		int numAxes();
+		int numAxis();
 
 	Q_SIGNALS:
 		void eventOccurred(EventType type,
