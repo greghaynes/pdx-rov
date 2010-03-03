@@ -8,5 +8,5 @@ UI_DIR = build
 LIBS +=-L/usr/lib64/ -ljoystick++
 LIBS+=-L/usr/lib64/kde4/devel -lkdeui
 FORMS = ui/mainwindow.ui
-HEADERS = src/mainwindowimpl.h
-SOURCES = src/mainwindowimpl.cpp src/main.cpp
+HEADERS = src/mainwindowimpl.h src/qjoystick.h
+SOURCES = src/mainwindowimpl.cpp src/qjoystick.cpp src/main.cpp
