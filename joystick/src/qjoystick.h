@@ -9,31 +9,33 @@
 
 class QJoystick
   : public QObject
-  , public Joystick
 {
-  Q_OBJECT
+	Q_OBJECT
 
-  public:
-    enum EventType
-    {
-      BUTTON,
-      AXES
-    };
+	public:
+		enum EventType
+		{
+		  BUTTON,
+		  AXES
+		};
 
-    QJoystick(QObject *parent = 0);
-    QString name();
-    QString device();
-    int numButtons();
-    int numAxes();
+		QJoystick(const QUrl &path, QObject *parent = 0);
+		QString name();
+		QString device();
+		int numButtons();
+		int numAxes();
 
-  Q_SIGNALS:
-    void eventOccoured(EventType type,
-      unsigned char number,
-      unsigned int time,
-      short int value);
+	Q_SIGNALS:
+		void eventOccurred(EventType type,
+			unsigned char number,
+			unsigned int time,
+			short int value);
+
+	private Q_SLOTS:
+		void onChanged(const QString &path);
   
-  private:s
-    QFileSystemWatcher *filesysWatcher;
+	private:
+		QFileSystemWatcher *filesysWatcher;
 
 };
 
