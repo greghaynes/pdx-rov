@@ -19,21 +19,40 @@ class QJoystick
 		};
 
 		QJoystick(const QString &path, QObject *parent = 0);
-		QString name();
-		QString device();
+		QString name() const;
+		QString device() const;
 		int numButtons();
 		int numAxis();
 
 	Q_SIGNALS:
+		/**
+		 * @brief Number of buttons available has changed.
+		 *
+		 * When emitted, numButtons is set to the new value of
+		 * buttons.
+		 */
+		void numButtonsChanged(int old_val);
+
+		/**
+		 * @brief Number of axis available has changed.
+		 *
+		 * When emitted, numAxis is set to the new value of
+		 * buttons.
+		 */
+		void numAxisChanged(int old_val);
 		void eventOccurred(EventType type,
 			unsigned char number,
 			unsigned int time,
 			short int value);
 
 	private Q_SLOTS:
+		void setNumButtons(int);
+		void setNumAxis(int);
 		void activated(int);
   
 	private:
+		int num_buttons;
+		int num_axis;
 		QSocketNotifier *socketNotifier;
 
 };

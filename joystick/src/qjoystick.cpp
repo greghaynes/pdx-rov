@@ -11,6 +11,8 @@
 QJoystick::QJoystick(const QString &path,
 	QObject *parent)
 	: QObject(parent)
+	, num_buttons(0)
+	, num_axis(0)
 	, socketNotifier(0)
 {
 	int fd;
@@ -33,14 +35,36 @@ QString QJoystick::device()
 	return "";
 }
 
-int QJoystick::numButtons()
+int QJoystick::numButtons() const
 {
-	return 0;
+	return num_buttons;
 }
 
-int QJoystick::numAxis()
+int QJoystick::numAxis() const
 {
-	return 0;
+	return num_axis;
+}
+
+void QJoystick::setNumButtons(int num)
+{
+	int old_count;
+	if(num_buttons < num)
+	{
+		old_count = num_buttons;
+		num_buttons = num;
+		emit(numButtonsChanged(old_count));
+	}
+}
+
+void QJoystick::setNumAxis(int num)
+{
+	int old_count;
+	if(num_axis < num)
+	{
+		old_count = num_axis;
+		num_axis = num;
+		emit(numAxisChanged(old_count));
+	}
 }
 
 void QJoystick::activated(int fd)
@@ -49,7 +73,6 @@ void QJoystick::activated(int fd)
 	static struct js_event ev;
 	EventType type;
 
-	qDebug() << "Retrieved joystick event.";
 	len = read(fd, &ev, sizeof(struct js_event));
 	if(len == -1 || len != sizeof(struct js_event))
 	{
@@ -57,19 +80,33 @@ void QJoystick::activated(int fd)
 		return;
 	}
 
-	// Set our event type
-	switch(ev.type)
+	if(ev.type & JS_EVENT_INIT)
 	{
-		case JS_EVENT_BUTTON:
-			type = Button;
-			break;
-		case JS_EVENT_AXIS:
-			type = Axis;
-			break;
-		default:
-			type = Init;
+		ev.type = ev.type & (~JS_EVENT_INIT);
+		switch(ev.type)
+		{
+			case JS_EVENT_BUTTON:
+				qDebug() << "Init button " << ev.number;
+				setNumButtons(ev.number+1);
+			case JS_EVENT_AXIS:
+				qDebug() << "Init axis " << ev.number;
+				setNumAxis(ev.number+1);
+		}
 	}
-
-	emit(eventOccurred(type, ev.number, ev.time, ev.value));
+	else
+	{
+		switch(ev.type)
+		{
+			case JS_EVENT_BUTTON:
+				type = Button;
+				break;
+			case JS_EVENT_AXIS:
+				type = Axis;
+				break;
+			default:
+				type = Init;
+		}
+		emit(eventOccurred(type, ev.number, ev.time, ev.value));
+	}
 }
 
