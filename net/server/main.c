@@ -1,35 +1,69 @@
-#include <event.h>
+#include "client.h"
+#include "request.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-struct client
-{
-	struct client *next;
-	int fd;
-	struct sockaddr_in sa;
-	struct event ev;
-};
+#include <ctype.h>
 
 struct server
 {
-	struct event ev;
 	int fd;
-	struct sockaddr_in sa;
 	struct client *clients;
+	struct event ev;
+	struct sockaddr_in sa;
 };
 
 static struct server srv;
 
+void line_recieved(struct client *client, char *line)
+{
+	char *itr;
+	char *var_name = line;
+	char *val;
+	char ctl;
+
+	itr = line;
+	while(*itr && isalnum(*itr)) itr++;
+	if(!*itr)
+	{
+		fprintf(stderr, "Invalid command: No control char found.\n");
+		return;
+	}
+
+	ctl = *itr;
+	*itr = '\0';
+	if(ctl == '?')
+		request_get(client, var_name);
+	else if(ctl == '=')
+	{
+		itr++;
+		val = itr;
+		while(*itr && *itr != '\n')
+		*itr = '\0';
+		request_set(client, line, val);
+	}
+	else
+		fprintf(stderr, "Invalid command: Unsupported control char found.\n");
+}
+
+void parse_received_chunk(struct client *client, char *buff, int len)
+{
+	//TODO buffer appending
+	line_recieved(client, buff);
+}
+
 void on_read(int fd, short event, void *data)
 {
-	char buff[256];
 	int len;
-	while((len = read(fd, &buff, 255)) == 255);
+	char buff[512];
+
+	while((len = read(fd, &buff, 511)) == 511)
+	{
+		buff[len] = '\0';
+		parse_received_chunk((struct client*)data, &buff, len);
+	}
 	if(len == 0)
 	{
 		struct client *ci, *pci;
@@ -41,9 +75,10 @@ void on_read(int fd, short event, void *data)
 			ci = ci->next;
 		}
 		if(ci != data)
-			fprintf(stderr, "Recieved read from non-stored connection");
+			fprintf(stderr, "Recieved read from non-stored connection.\n");
 		else
 		{
+			printf("Closing connection.\n");
 			if(pci)
 				pci->next = ci->next;
 			else
