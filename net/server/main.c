@@ -59,11 +59,7 @@ void on_read(int fd, short event, void *data)
 	int len;
 	char buff[512];
 
-	while((len = read(fd, &buff, 511)) == 511)
-	{
-		buff[len] = '\0';
-		parse_received_chunk((struct client*)data, &buff, len);
-	}
+	len = read(fd, &buff, 511);
 	if(len == 0)
 	{
 		struct client *ci, *pci;
@@ -88,7 +84,11 @@ void on_read(int fd, short event, void *data)
 		}
 	}
 	else
+	{
+		buff[len] = '\0';
+		parse_received_chunk((struct client*)data, &buff, len);
 		event_add(&((struct client*)data)->ev, 0);
+	}
 }
 
 void on_connect(int fd, short event, void *data)
