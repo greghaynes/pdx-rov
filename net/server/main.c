@@ -40,7 +40,7 @@ void line_recieved(struct client *client, char *line)
 	{
 		itr++;
 		val = itr;
-		while(*itr && *itr != '\n')
+		while(*itr && *itr != '\n') itr++;
 		*itr = '\0';
 		request_set(client, line, val);
 	}
