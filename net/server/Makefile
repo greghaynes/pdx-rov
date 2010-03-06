@@ -1,3 +1,6 @@
 all:
-	gcc main.c -levent
+	gcc -g main.c -levent -o server
+
+clean:
+	rm *.o  server
 
