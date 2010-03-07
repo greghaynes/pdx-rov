@@ -73,7 +73,7 @@ void QJoystick::activated(int fd)
 {
 	static int len;
 	static struct js_event ev;
-	EventType type;
+	int type;
 
 	len = read(fd, &ev, sizeof(struct js_event));
 	if(len == -1 || len != sizeof(struct js_event))
@@ -85,30 +85,26 @@ void QJoystick::activated(int fd)
 	if(ev.type & JS_EVENT_INIT)
 	{
 		ev.type = ev.type & (~JS_EVENT_INIT);
-		switch(ev.type)
+		if(ev.type & JS_EVENT_BUTTON)
 		{
-			case JS_EVENT_BUTTON:
 				qDebug() << "Init button " << ev.number;
 				setNumButtons(ev.number+1);
-			case JS_EVENT_AXIS:
+		}
+		if(ev.type & JS_EVENT_AXIS)
+		{
 				qDebug() << "Init axis " << ev.number;
 				setNumAxis(ev.number+1);
 		}
 	}
 	else
 	{
-		switch(ev.type)
-		{
-			case JS_EVENT_BUTTON:
+		if(ev.type & JS_EVENT_BUTTON)
 				type = Button;
-				break;
-			case JS_EVENT_AXIS:
-				type = Axis;
-				break;
-			default:
-				type = Init;
-		}
-		emit(eventOccurred(type, ev.number, ev.time, ev.value));
+		if(ev.type & JS_EVENT_AXIS)
+				type = type | Axis;
+		if(ev.type & JS_EVENT_INIT)
+				type = type | Init;
+		emit(eventOccurred((EventType)type, ev.number, ev.time, ev.value));
 	}
 }
 

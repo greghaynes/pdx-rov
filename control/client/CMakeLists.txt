@@ -5,7 +5,8 @@ INCLUDE(${QT_USE_FILE})
 set(client_SRCS
 	main.cpp
 	rovconnection.cpp
-	qjoystick.cpp)
+	qjoystick.cpp
+	rovjoystick.cpp)
 
 QT4_AUTOMOC(${client_SRCS})
 
