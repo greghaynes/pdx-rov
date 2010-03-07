@@ -8,6 +8,8 @@
 
 #include <linux/joystick.h>
 
+#include "qjoystick.moc"
+
 QJoystick::QJoystick(const QString &path,
 	QObject *parent)
 	: QObject(parent)
@@ -25,12 +27,12 @@ QJoystick::QJoystick(const QString &path,
 	}
 }
 
-QString QJoystick::name()
+QString QJoystick::name() const
 {
 	return "";
 }
 
-QString QJoystick::device()
+QString QJoystick::device() const
 {
 	return "";
 }
