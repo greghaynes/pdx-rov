@@ -2,15 +2,17 @@
 #include "rovconnection.h"
 #include "qjoystick.h"
 
+#include <QDebug>
+
 RovJoystick::RovJoystick(const QString &path,
 	QObject *parent)
 	: QJoystick(path, parent)
 	, m_conn(new RovConnection(this))
 {
 	connect(this, SIGNAL(eventOccurred(
-			EventType, unsigned char, unsigned int, short int)),
+			int, unsigned char, unsigned int, short int)),
 		this, SLOT(onJoystickEvent(	
-			EventType, unsigned char, unsigned int, short int)));
+			int, unsigned char, unsigned int, short int)));
 }
 
 RovConnection &RovJoystick::connection()
@@ -18,23 +20,18 @@ RovConnection &RovJoystick::connection()
 	return *m_conn;
 }
 
-void RovJoystick::onJoystickEvent(EventType type,
+void RovJoystick::onJoystickEvent(int type,
 	unsigned char number,
 	unsigned int time,
 	short int val)
 {
 	QString var;
-	switch(type)
-	{
-		Button:
+	if(type == QJoystick::Button)
 			var = "Button";
-			break;
-		Axis:
+	else if(type == QJoystick::Axis)
 			var = "Axis";
-			break;
-		default:
+	else
 			var = "Unknown";
-	}
 	var.append(QString::number(number));
 	m_conn->setVar(var, QString::number(val));
 }

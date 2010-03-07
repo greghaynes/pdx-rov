@@ -17,7 +17,7 @@ class RovJoystick
 		RovConnection &connection();
 
 	private Q_SLOTS:
-		void onJoystickEvent(EventType type,
+		void onJoystickEvent(int type,
 			unsigned char number,
 			unsigned int time,
 			short int val);

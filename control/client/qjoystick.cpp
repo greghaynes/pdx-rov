@@ -98,13 +98,14 @@ void QJoystick::activated(int fd)
 	}
 	else
 	{
+		type = 0;
 		if(ev.type & JS_EVENT_BUTTON)
 				type = Button;
 		if(ev.type & JS_EVENT_AXIS)
 				type = type | Axis;
 		if(ev.type & JS_EVENT_INIT)
 				type = type | Init;
-		emit(eventOccurred((EventType)type, ev.number, ev.time, ev.value));
+		emit(eventOccurred(type, ev.number, ev.time, ev.value));
 	}
 }
 

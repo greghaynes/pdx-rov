@@ -21,8 +21,8 @@ class QJoystick
 		QJoystick(const QString &path, QObject *parent = 0);
 		QString name() const;
 		QString device() const;
-		int numButtons();
-		int numAxis();
+		int numButtons() const;
+		int numAxis() const;
 
 	Q_SIGNALS:
 		/**
@@ -40,7 +40,8 @@ class QJoystick
 		 * buttons.
 		 */
 		void numAxisChanged(int old_val);
-		void eventOccurred(EventType type,
+
+		void eventOccurred(int type,
 			unsigned char number,
 			unsigned int time,
 			short int value);
