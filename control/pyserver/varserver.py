@@ -15,7 +15,7 @@ class VarHandlerHandler(object):
 			client.send('NOT_REGISTERED\n')
 		else:
 			for handler in handlers:
-				handler(var, client)
+				handler[0](var, client, *handler[1])
 	def emit_set(self, var, val, client):
 		try:
 			handlers = self.set_handlers[var]
@@ -24,21 +24,21 @@ class VarHandlerHandler(object):
 			client.send('NOT_REGISTERED\n')
 		else:
 			for handler in handlers:
-				handler(var, val, client)
-	def add_query_handler(self, var, handler):
+				handler[0](var, val, client, *handler[1])
+	def add_query_handler(self, var, handler, *args):
 		try:
 			handlers = self.query_handlers[var]
 		except KeyError:
 			self.query_handlers[var] = []
 			handlers = self.query_handlers[var]
-		handlers.append(handler)
-	def add_set_handler(self, var, handler):
+		handlers.append((handler, args))
+	def add_set_handler(self, var, handler, *args):
 		try:
 			handlers = self.set_handlers[var]
 		except KeyError:
 			self.query_handlers[var] = []
 			handlers = self.set_handlers[var]
-		handlers.append(handler)
+		handlers.append((handler, args))
 
 class VarClient(asyncore.dispatcher):
 	inre = re.compile('\w*[=?]')
@@ -100,6 +100,9 @@ class VarServer(asyncore.dispatcher):
 		conn = self.socket.accept()
 		logging.debug('Accepted connection from %s', conn[1])
 		self.clients.append(VarClient(self, conn[0]))
+	def broadcast(self, data):
+		for client in self.clients:
+			client.send(data)
 
 def varHandler(var, client):
 	print '%s queried' % var
