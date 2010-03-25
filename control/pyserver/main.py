@@ -4,7 +4,7 @@ import socket
 import serial
 import logging
 import struct
-import sys
+import sys, getopt
 
 LOG_LEVEL = logging.DEBUG
 SC_PATH = '/dev/ttyUSB0'
@@ -31,13 +31,20 @@ def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
 
 def showHelp():
-	print 'Usage: python main.py [-h] [-p port] -d device_path'
+	print 'Usage: python main.py [-h] [-p port] -c device_path'
 
 if __name__ == '__main__':
-	for arg in sys.argv:
-		
+	opts, args = getopt.getopt(sys.argv[1:], 'hp:d', '')
+	for opt in opts:
+		if opt[0] == '-p':
+			port = int(opt[1])
+		elif opt[0] == '-c':
+			SC_PATH = opt[1]
+		elif opt[0] == '-h':
+			showHelp()
+			sys.exit(0)
 	setupLogging()
-	server = varserver.VarServer('', 8080)
+	server = varserver.VarServer('', port)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1))
 	server.var_hh.add_query_handler('FW_Version', sc.version)
 	server.var_hh.add_query_handler('Servo1', sc.sposition)
