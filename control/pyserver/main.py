@@ -3,6 +3,7 @@ import asyncore
 import socket
 import serial
 import logging
+import struct
 
 LOG_LEVEL = logging.DEBUG
 SC_PATH = '/dev/ttyUSB0'
@@ -15,6 +16,13 @@ class ServoController(object):
 		data = self.s.read(3)
 		if len(data) > 0:
 			client.send(data)
+		client.send('\n')
+	def sposition(self, q_var, client):
+		self.s.write('!SCRSP\x00\r')
+		data = self.s.read(3)
+		if len(data) == 3:
+			data = struct.unpack('BH', data)
+			client.send(data[1])
 		client.send('\n')
 
 def setupLogging():
