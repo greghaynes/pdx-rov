@@ -1,13 +1,12 @@
 #include <QApplication>
-#include "rovjoystick.h"
-#include "rovconnection.h"
+#include "mainwindow.h"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	
-	RovJoystick rovStick("/dev/input/js1");
-	rovStick.connection().connectToHost("localhost", 8081);
+	MainWindow *mainWindow = new MainWindow();
+	mainWindow->setVisible(true);
 	
 	return app.exec();
 }

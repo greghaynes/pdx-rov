@@ -15,6 +15,7 @@ QJoystick::QJoystick(const QString &path,
 	: QObject(parent)
 	, num_buttons(0)
 	, num_axis(0)
+	, m_path(path)
 	, socketNotifier(0)
 {
 	int fd;
@@ -35,6 +36,11 @@ QString QJoystick::name() const
 QString QJoystick::device() const
 {
 	return "";
+}
+
+const QString &QJoystick::path() const
+{
+	return m_path;
 }
 
 int QJoystick::numButtons() const

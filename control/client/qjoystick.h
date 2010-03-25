@@ -21,6 +21,7 @@ class QJoystick
 		QJoystick(const QString &path, QObject *parent = 0);
 		QString name() const;
 		QString device() const;
+		const QString &path() const;
 		int numButtons() const;
 		int numAxis() const;
 
@@ -55,6 +56,7 @@ class QJoystick
 		int num_buttons;
 		int num_axis;
 		QSocketNotifier *socketNotifier;
+		QString m_path;
 
 };
 
