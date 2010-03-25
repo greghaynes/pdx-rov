@@ -33,5 +33,6 @@ if __name__ == '__main__':
 	server = varserver.VarServer('', 8080)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1))
 	server.var_hh.add_query_handler('FW_Version', sc.version)
+	server.var_hh.add_query_handler('Servo1', sc.sposition)
 	asyncore.loop(timeout=2)
 
