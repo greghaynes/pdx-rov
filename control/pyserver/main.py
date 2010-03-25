@@ -16,7 +16,6 @@ class ServoController(object):
 		if len(data) > 0:
 			client.send(data)
 		client.send('\n')
-	def setpos(self, 
 
 def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
