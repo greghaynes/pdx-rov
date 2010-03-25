@@ -16,6 +16,7 @@ class ServoController(object):
 		if len(data) > 0:
 			client.send(data)
 		client.send('\n')
+	def setpos(self, 
 
 def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
@@ -24,6 +25,6 @@ if __name__ == '__main__':
 	setupLogging()
 	server = varserver.VarServer('', 8080)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1))
-	server.var_hh.add_query_handler('SC_Version', sc.version)
+	server.var_hh.add_query_handler('FW_Version', sc.version)
 	asyncore.loop(timeout=2)
 
