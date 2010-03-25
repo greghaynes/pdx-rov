@@ -34,7 +34,11 @@ def showHelp():
 	print 'Usage: python main.py [-h] [-p port] -c device_path'
 
 if __name__ == '__main__':
-	opts, args = getopt.getopt(sys.argv[1:], 'hp:d', '')
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], 'p:c:h', '')
+	except getopt.GetOptError:
+		print 'Invalid argument'
+		showHelp()
 	for opt in opts:
 		if opt[0] == '-p':
 			port = int(opt[1])
