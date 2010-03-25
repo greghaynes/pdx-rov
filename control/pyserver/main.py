@@ -7,7 +7,7 @@ import struct
 import sys, getopt
 
 LOG_LEVEL = logging.DEBUG
-SC_PATH = '/dev/ttyUSB0'
+SC_PATH = ''
 port = 8080
 
 class ServoController(object):
@@ -43,6 +43,9 @@ if __name__ == '__main__':
 		elif opt[0] == '-h':
 			showHelp()
 			sys.exit(0)
+	if SC_PATH == '':
+		showHelp()
+		sys.exit(0)
 	setupLogging()
 	server = varserver.VarServer('', port)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1))
