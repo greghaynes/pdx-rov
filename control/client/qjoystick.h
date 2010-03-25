@@ -47,6 +47,12 @@ class QJoystick
 			unsigned int time,
 			short int value);
 
+	protected:
+		virtual void onEvent(int type,
+			unsigned char number,
+			unsigned int time,
+			short int value);
+
 	private Q_SLOTS:
 		void setNumButtons(int);
 		void setNumAxis(int);

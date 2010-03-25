@@ -8,7 +8,6 @@ class RovConnection;
 class RovJoystick
 	: public QJoystick
 {
-	Q_OBJECT
 
 	public:
 		RovJoystick(const QString &path,
@@ -16,8 +15,13 @@ class RovJoystick
 
 		RovConnection &connection();
 
-	private Q_SLOTS:
 		void onJoystickEvent(int type,
+			unsigned char number,
+			unsigned int time,
+			short int val);
+
+	protected:
+		void onEvent(int type,
 			unsigned char number,
 			unsigned int time,
 			short int val);

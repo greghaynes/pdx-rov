@@ -53,6 +53,13 @@ int QJoystick::numAxis() const
 	return num_axis;
 }
 
+void QJoystick::onEvent(int type,
+	unsigned char number,
+	unsigned int time,
+	short int value)
+{
+}
+
 void QJoystick::setNumButtons(int num)
 {
 	int old_count;
@@ -111,6 +118,7 @@ void QJoystick::activated(int fd)
 				type = type | Axis;
 		if(ev.type & JS_EVENT_INIT)
 				type = type | Init;
+		onEvent(type, ev.number, ev.time, ev.value);
 		emit(eventOccurred(type, ev.number, ev.time, ev.value));
 	}
 }
