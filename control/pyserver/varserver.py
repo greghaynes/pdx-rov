@@ -36,7 +36,7 @@ class VarHandlerHandler(object):
 		try:
 			handlers = self.set_handlers[var]
 		except KeyError:
-			self.query_handlers[var] = []
+			self.set_handlers[var] = []
 			handlers = self.set_handlers[var]
 		handlers.append((handler, args))
 
@@ -103,6 +103,8 @@ class VarServer(asyncore.dispatcher):
 	def broadcast(self, data):
 		for client in self.clients:
 			client.send(data)
+	def broadcast_var_state(self, var, val):
+		self.broadcast('%s=%s\n' % (var, val))
 
 def varHandler(var, client):
 	print '%s queried' % var
