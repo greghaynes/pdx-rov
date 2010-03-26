@@ -92,9 +92,9 @@ if __name__ == '__main__':
 	setupLogging()
 	server = varserver.VarServer('', port)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1), server)
-	server.var_hh.add_query_handler('FW_Version', sc.version)
+	server.var_hh.add_query_handler('FW_VERSION', 'FW_Version', sc.version)
 	s1 = Servo(sc, 0)
-	server.var_hh.add_query_handler('Servo1', s1.position)
-	server.var_hh.add_set_handler('Servo1', s1.set_position)
+	server.var_hh.add_query_handler('SERVO_POS', 'Servo1', s1.position)
+	server.var_hh.add_set_handler('SERVO_POS', 'Servo1', s1.set_position)
 	asyncore.loop(timeout=2)
 
