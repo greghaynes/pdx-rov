@@ -31,6 +31,9 @@ class VarHandlerHandler(object):
 		except KeyError:
 			self.query_handlers[var] = []
 			handlers = self.query_handlers[var]
+		else:
+			if handlers[0][0] != type:
+				raise ValueError('Incompatible types for handlers')
 		handlers.append((type, handler, args))
 	def add_set_handler(self, type, var, handler, *args):
 		try:
@@ -38,6 +41,9 @@ class VarHandlerHandler(object):
 		except KeyError:
 			self.set_handlers[var] = []
 			handlers = self.set_handlers[var]
+		else:
+			if handlers[0][0] != type:
+				raise ValueError('Incompatible types for handlers')
 		handlers.append((type, handler, args))
 
 class VarClient(asyncore.dispatcher):
