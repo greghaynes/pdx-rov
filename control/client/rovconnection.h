@@ -34,6 +34,8 @@ class RovConnection
 
 		const QString &label() const;
 
+		void removeMonitor(VarMonitor &monitor);
+
 	private Q_SLOTS:
 		void dataRecieved();
 

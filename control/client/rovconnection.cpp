@@ -58,6 +58,12 @@ const QString &RovConnection::label() const
 	return m_label;
 }
 
+void RovConnection::removeMonitor(VarMonitor &monitor)
+{
+	monitors[monitor.name()].removeAll(&monitor);
+	monitor_list.removeAll(&monitor);
+}
+
 void RovConnection::dataRecieved()
 {
 	QString line = readLine();

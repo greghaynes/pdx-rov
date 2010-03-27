@@ -36,7 +36,7 @@ void MainWindow::addServoMonitor()
 	CreateServoDialog *d = new CreateServoDialog(*m_connManager, this);
 	if(d->exec())
 	{
-		ServoWidget *widget = new ServoWidget(d->name(), d->name());
+		ServoWidget *widget = new ServoWidget(d->name(), d->name(), d->connection());
 		d->connection().addMonitor(*widget);
 		widget->setVisible(true);
 	}

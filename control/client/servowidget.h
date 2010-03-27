@@ -7,6 +7,8 @@
 #include <QString>
 #include <QLabel>
 
+class RovConnection;
+
 class ServoWidget
 	: public QWidget
 	, public VarMonitor
@@ -15,7 +17,10 @@ class ServoWidget
 	public:
 		ServoWidget(const QString &name,
 			const QString &var_name,
+			RovConnection &conn,
 			QWidget *parent = 0);
+
+		~ServoWidget();
 
 		int max() const;
 		int min() const;
@@ -30,6 +35,7 @@ class ServoWidget
 		QString m_str_pos;
 
 		QLabel *posLabel;
+		RovConnection *m_conn;
 
 };
 
