@@ -7,6 +7,7 @@
 #include <QTableView>
 
 class JoysticksModel;
+class ConnectionManager;
 
 class MainWindow
 	: public QMainWindow
@@ -18,6 +19,7 @@ class MainWindow
 
 	private Q_SLOTS:
 		void addJoystick();
+		void addServoMonitor();
 
 	private:
 		void setupToolbars();
@@ -25,8 +27,10 @@ class MainWindow
 
 		QToolBar *m_toolBar;
 		QAction *addJoystickAction;
+		QAction *addServoMonitorAction;
 		QTableView *m_joysticksTable;
 		JoysticksModel *m_joysticksModel;
+		ConnectionManager *m_connManager;
 
 };
 

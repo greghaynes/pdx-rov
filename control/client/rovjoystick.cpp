@@ -7,7 +7,7 @@
 RovJoystick::RovJoystick(const QString &path,
 	QObject *parent)
 	: QJoystick(path, parent)
-	, m_conn(new RovConnection(this))
+	, m_conn(new RovConnection(path, this))
 {
 }
 

@@ -9,10 +9,16 @@ set(client_SRCS
 	joysticksmodel.cpp
 	mainwindow.cpp
 	createjoystickdialog.cpp
+	connectionmanager.cpp
+	createservodialog.cpp
+	varmonitor.cpp
+	servowidget.cpp
 	rovjoystick.cpp)
 
 set(ui_SRCS
-	createjoystickwidget.ui)
+	createjoystickwidget.ui
+	createservowidget.ui
+	createconnectionwidget.ui)
 
 QT4_AUTOMOC(${client_SRCS})
 QT4_WRAP_UI(client_SRCS ${ui_SRCS})

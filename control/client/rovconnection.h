@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QHash>
+#include <QString>
+
+class VarMonitor;
 
 class RovConnection
 	: public QTcpSocket
@@ -10,7 +14,8 @@ class RovConnection
 	Q_OBJECT
 
 	public:
-		RovConnection(QObject *parent = 0);
+		RovConnection(QString label,
+			QObject *parent = 0);
 
 		bool setVar(const QString &name,
 			const QString &value);
@@ -24,12 +29,20 @@ class RovConnection
 		 */
 		bool reqVar(const QString &name);
 
+		void addMonitor(VarMonitor &monitor);
+
+		const QString &label() const;
+
 	private Q_SLOTS:
 		void dataRecieved();
 
 	Q_SIGNALS:
 		void var(const QString &name,
 			const QString &value);
+
+	private:
+		QString m_label;
+		QHash<QString, VarMonitor*> monitors;
 
 };
 

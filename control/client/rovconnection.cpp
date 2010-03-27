@@ -1,7 +1,10 @@
 #include "rovconnection.h"
+#include "varmonitor.h"
 
-RovConnection::RovConnection(QObject *parent)
+RovConnection::RovConnection(QString label,
+	QObject *parent)
 	: QTcpSocket(parent)
+	, m_label(label)
 {
 }
 
@@ -31,6 +34,16 @@ bool RovConnection::reqVar(const QString &name)
 		return true;
 	}
 	return false;
+}
+
+void RovConnection::addMonitor(VarMonitor &monitor)
+{
+	monitors[monitor.name()] = &monitor;
+}
+
+const QString &RovConnection::label() const
+{
+	return m_label;
 }
 
 void RovConnection::dataRecieved()
