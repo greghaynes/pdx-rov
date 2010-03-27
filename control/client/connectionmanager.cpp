@@ -3,6 +3,8 @@
 
 #include "ui_createconnectionwidget.h"
 
+#include <QErrorMessage>
+
 CreateConnectionDialog::CreateConnectionDialog(QWidget *parent)
 	: QDialog(parent)
 	, ui(new Ui::CreateConnectionWidget)
@@ -49,7 +51,28 @@ void ConnectionManager::createConnection()
 		conn->connectToHost(d->hostname(),
 			d->port().toInt());
 		emit(connectionAdded(*conn));
+		connect(conn, SIGNAL(error(QAbstractSocket::SocketError)),
+			this, SLOT(connectionError(QAbstractSocket::SocketError)));
 	}
+}
+
+void ConnectionManager::connectionError(QAbstractSocket::SocketError error)
+{
+	QErrorMessage *msgD = new QErrorMessage();
+	QString msg = "Connection error: ";
+	switch(error)
+	{
+		case QAbstractSocket::HostNotFoundError:
+			msg.append("Host not found");
+			break;
+		case QAbstractSocket::ConnectionRefusedError:
+			msg.append("Connection refused");
+			break;
+		case QAbstractSocket::RemoteHostClosedError:
+			msg.append("Remote host closed the connection");
+	}
+	msgD->showMessage(msg);
+	msgD->exec();
 }
 
 #include "connectionmanager.moc"

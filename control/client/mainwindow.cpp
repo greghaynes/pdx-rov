@@ -5,6 +5,7 @@
 #include "joysticksmodel.h"
 #include "connectionmanager.h"
 #include "servowidget.h"
+#include "rovconnection.h"
 
 #include <QVBoxLayout>
 
@@ -36,6 +37,7 @@ void MainWindow::addServoMonitor()
 	if(d->exec())
 	{
 		ServoWidget *widget = new ServoWidget(d->name(), d->name());
+		d->connection().addMonitor(*widget);
 		widget->setVisible(true);
 	}
 }

@@ -14,8 +14,9 @@ class RovConnection
 	Q_OBJECT
 
 	public:
-		RovConnection(QString label,
+		RovConnection(QString label = QString(),
 			QObject *parent = 0);
+		~RovConnection();
 
 		bool setVar(const QString &name,
 			const QString &value);
@@ -42,7 +43,8 @@ class RovConnection
 
 	private:
 		QString m_label;
-		QHash<QString, VarMonitor*> monitors;
+		QHash<QString, QList<VarMonitor*> > monitors;
+		QList<VarMonitor*> monitor_list;
 
 };
 

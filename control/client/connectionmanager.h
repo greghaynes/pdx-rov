@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDialog>
 #include <QList>
+#include <QAbstractSocket>
 
 namespace Ui
 {
@@ -44,6 +45,9 @@ class ConnectionManager
 
 	public Q_SLOTS:
 		void createConnection();
+
+	private Q_SLOTS:
+		void connectionError(QAbstractSocket::SocketError error);
 
 	private:
 		QList<RovConnection*> m_connections;

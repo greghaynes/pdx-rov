@@ -1,6 +1,7 @@
 #include "servowidget.h"
 
 #include <QVBoxLayout>
+#include <QDebug>
 
 ServoWidget::ServoWidget(const QString &name,
 	const QString &var_name,
@@ -42,5 +43,6 @@ void ServoWidget::setPos(int val)
 void ServoWidget::gotValue(const QString &value)
 {
 	setPos(value.toInt());
+	qDebug() << "Got value " << value;
 }
 

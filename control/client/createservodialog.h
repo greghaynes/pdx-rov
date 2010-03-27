@@ -21,12 +21,14 @@ class CreateServoDialog
 			QWidget *parent = 0);
 
 		QString name();
+		RovConnection &connection();
 
 	private Q_SLOTS:
 		void connectionAdded(RovConnection &conn);
 
 	private:
 		Ui::CreateServoWidget *ui;
+		ConnectionManager *m_conn_manager;
 
 };
 

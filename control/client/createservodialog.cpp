@@ -11,6 +11,7 @@ CreateServoDialog::CreateServoDialog(ConnectionManager &conn_manager,
 	QWidget *parent)
 	: QDialog(parent)
 	, ui(new Ui::CreateServoWidget)
+	, m_conn_manager(&conn_manager)
 {
 	ui->setupUi(this);
 
@@ -33,6 +34,11 @@ CreateServoDialog::CreateServoDialog(ConnectionManager &conn_manager,
 QString CreateServoDialog::name()
 {
 	return ui->nameLineEdit->text();
+}
+
+RovConnection &CreateServoDialog::connection()
+{
+	return *m_conn_manager->connections()[ui->connectionComboBox->currentIndex()];
 }
 
 void CreateServoDialog::connectionAdded(RovConnection &conn)
