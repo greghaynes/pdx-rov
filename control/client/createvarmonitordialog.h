@@ -1,23 +1,23 @@
-#ifndef CREATE_SERVO_DIALOG
-#define CREATE_SERVO_DIALOG
+#ifndef CREATE_VAR_MONITOR_DIALOG
+#define CREATE_VAR_MONITOR_DIALOG
 
 #include <QDialog>
 
 namespace Ui
 {
-	class CreateServoWidget;
+	class CreateVarMonitorWidget;
 };
 
 class RovConnection;
 class ConnectionManager;
 
-class CreateServoDialog
+class CreateVarMonitorDialog
 	: public QDialog
 {
 	Q_OBJECT
 
 	public:
-		CreateServoDialog(ConnectionManager &conn_manager,
+		CreateVarMonitorDialog(ConnectionManager &conn_manager,
 			QWidget *parent = 0);
 
 		QString name();
@@ -27,7 +27,7 @@ class CreateServoDialog
 		void connectionAdded(RovConnection &conn);
 
 	private:
-		Ui::CreateServoWidget *ui;
+		Ui::CreateVarMonitorWidget *ui;
 		ConnectionManager *m_conn_manager;
 
 };

@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "createjoystickdialog.h"
-#include "createservodialog.h"
+#include "createvarmonitordialog.h"
 #include "qjoystick.h"
 #include "joysticksmodel.h"
 #include "connectionmanager.h"
@@ -31,9 +31,9 @@ void MainWindow::addJoystick()
 	}
 }
 
-void MainWindow::addServoMonitor()
+void MainWindow::addVarMonitor()
 {
-	CreateServoDialog *d = new CreateServoDialog(*m_connManager, this);
+	CreateVarMonitorDialog *d = new CreateVarMonitorDialog(*m_connManager, this);
 	if(d->exec())
 	{
 		ServoWidget *widget = new ServoWidget(d->name(), d->name(), d->connection());
@@ -46,7 +46,7 @@ void MainWindow::setupToolbars()
 {
 	m_toolBar = new QToolBar(this);
 	m_toolBar->addAction(addJoystickAction);
-	m_toolBar->addAction(addServoMonitorAction);
+	m_toolBar->addAction(addVarMonitorAction);
 
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
 }
@@ -56,9 +56,9 @@ void MainWindow::setupActions()
 	addJoystickAction = new QAction("Add Joystick", this);
 	connect(addJoystickAction, SIGNAL(triggered(bool)),
 		this, SLOT(addJoystick()));
-	addServoMonitorAction = new QAction("Add Servo Monitor", this);
-	connect(addServoMonitorAction, SIGNAL(triggered(bool)),
-		this, SLOT(addServoMonitor()));
+	addVarMonitorAction = new QAction("Add Variable Monitor", this);
+	connect(addVarMonitorAction, SIGNAL(triggered(bool)),
+		this, SLOT(addVarMonitor()));
 }
 
 #include "mainwindow.moc"

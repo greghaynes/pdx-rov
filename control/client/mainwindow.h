@@ -19,7 +19,7 @@ class MainWindow
 
 	private Q_SLOTS:
 		void addJoystick();
-		void addServoMonitor();
+		void addVarMonitor();
 
 	private:
 		void setupToolbars();
@@ -27,7 +27,7 @@ class MainWindow
 
 		QToolBar *m_toolBar;
 		QAction *addJoystickAction;
-		QAction *addServoMonitorAction;
+		QAction *addVarMonitorAction;
 		QTableView *m_joysticksTable;
 		JoysticksModel *m_joysticksModel;
 		ConnectionManager *m_connManager;

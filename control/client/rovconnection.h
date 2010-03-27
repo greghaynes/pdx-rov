@@ -42,6 +42,8 @@ class RovConnection
 	Q_SIGNALS:
 		void var(const QString &name,
 			const QString &value);
+		void queryType(const QString &name,
+			const QString &value);
 
 	private:
 		QString m_label;

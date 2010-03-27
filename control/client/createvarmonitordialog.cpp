@@ -1,16 +1,16 @@
-#include "createservodialog.h"
+#include "createvarmonitordialog.h"
 #include "connectionmanager.h"
 #include "rovconnection.h"
 
 #include <QVariant>
 #include <QHostAddress>
 
-#include "ui_createservowidget.h"
+#include "ui_createvarmonitorwidget.h"
 
-CreateServoDialog::CreateServoDialog(ConnectionManager &conn_manager,
+CreateVarMonitorDialog::CreateVarMonitorDialog(ConnectionManager &conn_manager,
 	QWidget *parent)
 	: QDialog(parent)
-	, ui(new Ui::CreateServoWidget)
+	, ui(new Ui::CreateVarMonitorWidget)
 	, m_conn_manager(&conn_manager)
 {
 	ui->setupUi(this);
@@ -31,20 +31,20 @@ CreateServoDialog::CreateServoDialog(ConnectionManager &conn_manager,
 	}
 }
 
-QString CreateServoDialog::name()
+QString CreateVarMonitorDialog::name()
 {
 	return ui->nameLineEdit->text();
 }
 
-RovConnection &CreateServoDialog::connection()
+RovConnection &CreateVarMonitorDialog::connection()
 {
 	return *m_conn_manager->connections()[ui->connectionComboBox->currentIndex()];
 }
 
-void CreateServoDialog::connectionAdded(RovConnection &conn)
+void CreateVarMonitorDialog::connectionAdded(RovConnection &conn)
 {
 	ui->connectionComboBox->addItem(conn.label());
 }
 
-#include "createservodialog.moc"
+#include "createvarmonitordialog.moc"
 

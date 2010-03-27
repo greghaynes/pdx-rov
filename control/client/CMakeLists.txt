@@ -8,16 +8,17 @@ set(client_SRCS
 	qjoystick.cpp
 	joysticksmodel.cpp
 	mainwindow.cpp
+	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
 	connectionmanager.cpp
-	createservodialog.cpp
+	createvarmonitordialog.cpp
 	varmonitor.cpp
 	servowidget.cpp
 	rovjoystick.cpp)
 
 set(ui_SRCS
 	createjoystickwidget.ui
-	createservowidget.ui
+	createvarmonitorwidget.ui
 	createconnectionwidget.ui)
 
 QT4_AUTOMOC(${client_SRCS})
