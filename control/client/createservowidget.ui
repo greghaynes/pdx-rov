@@ -113,6 +113,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>servoNameLineEdit</tabstop>
+  <tabstop>nameLineEdit</tabstop>
+  <tabstop>connectionComboBox</tabstop>
+  <tabstop>okPushButton</tabstop>
+  <tabstop>cancelPushButton</tabstop>
+  <tabstop>addConnectionPushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

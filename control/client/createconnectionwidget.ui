@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
-    <height>195</height>
+    <width>324</width>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,6 +98,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>labelLineEdit</tabstop>
+  <tabstop>hostnameLineEdit</tabstop>
+  <tabstop>portLineEdit</tabstop>
+  <tabstop>okPushButton</tabstop>
+  <tabstop>cancelPushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

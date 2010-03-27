@@ -28,6 +28,7 @@ bool RovConnection::setVar(const QString &name,
 		send = name;
 		send.append("=");
 		send.append(value);
+		send.append("\n");
 		write(send.toAscii());
 		return true;
 	}
@@ -40,7 +41,7 @@ bool RovConnection::reqVar(const QString &name)
 	if(state() == ConnectedState)
 	{
 		send = name;
-		send.append("?");
+		send.append("?\n");
 		write(send.toAscii());
 		return true;
 	}

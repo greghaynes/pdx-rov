@@ -13,6 +13,7 @@ class ServoWidget
 	: public QWidget
 	, public VarMonitor
 {
+	Q_OBJECT
 	
 	public:
 		ServoWidget(const QString &name,
