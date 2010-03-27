@@ -18,7 +18,7 @@ class Servo(object):
 		self.controller = controller
 		self.channel = channel
 		self.serv_val_factor = (self.max[1] - self.min[1]) / (self.max[0] - self.min[0])
-		self.client_val_factor = 1 / self.serv_val_factor
+		self.client_val_factor = 1 / float(self.serv_val_factor)
 	def convert_client_value(self, value):
 		if value < self.min[0] or value > self.max[0]:
 			raise ValueError('Out of range')
@@ -26,7 +26,7 @@ class Servo(object):
 	def convert_server_value(self, value):
 		if value < self.min[1] or value > self.max[1]:
 			raise ValueError('Out of range')
-		return (self.min[0] - self.min[1]) + (self.client_val_factor * value)
+		return self.client_val_factor * (value + (self.min[0] - self.min[1]))
 	def set_position(self, q_var, value, client):
 		value = int(value)
 		try:
@@ -40,17 +40,18 @@ class Servo(object):
 			self.controller.sendCommand(cmd)
 			self.controller.server.broadcast_var_state(q_var, value)
 	def position(self, q_var, client):
-		self.controller.sendCommand('SP' + struct.pack('B', self.channel))
+		self.controller.sendCommand('RSP' + struct.pack('B', self.channel))
 		data = self.controller.s.read(3)
 		if len(data) == 3:
-			data = struct.unpack('H', data[1:])
+			data = data[2] + data[1]
+			data = struct.unpack('H', data)
 			logging.debug(data)
 			try:
-				data = self.convert_server_value(data)
+				data = self.convert_server_value(data[0])
 			except ValueError:
 				client.send('INVALID_VALUE\n')
 			else:
-				self.controller.server.broadcast_var_state(q_var, str(data))
+				client.send('%s=%i\n' % (q_var, data))
 		client.send('\n')
 
 class ServoController(object):
