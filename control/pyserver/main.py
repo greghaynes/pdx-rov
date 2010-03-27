@@ -51,7 +51,7 @@ class Servo(object):
 			except ValueError:
 				client.send('INVALID_VALUE\n')
 			else:
-				client.send('%s=%i\n' % (q_var, data))
+				client.send('%s=%i' % (q_var, data))
 		client.send('\n')
 
 class ServoController(object):
