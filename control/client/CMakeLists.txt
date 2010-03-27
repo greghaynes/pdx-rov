@@ -12,6 +12,7 @@ set(client_SRCS
 	createjoystickdialog.cpp
 	connectionmanager.cpp
 	createvarmonitordialog.cpp
+	varmonitorcreationprogressdialog.cpp
 	varmonitor.cpp
 	servowidget.cpp
 	rovjoystick.cpp)

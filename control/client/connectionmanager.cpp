@@ -32,8 +32,12 @@ QString CreateConnectionDialog::port()
 	return ui->portLineEdit->text();
 }
 
-ConnectionManager::ConnectionManager()
+ConnectionManager *ConnectionManager::instance()
 {
+	static ConnectionManager *m;
+	if(!m)
+		m = new ConnectionManager();
+	return m;
 }
 
 QList<RovConnection*> &ConnectionManager::connections()
@@ -73,6 +77,10 @@ void ConnectionManager::connectionError(QAbstractSocket::SocketError error)
 	}
 	msgD->showMessage(msg);
 	msgD->exec();
+}
+
+ConnectionManager::ConnectionManager()
+{
 }
 
 #include "connectionmanager.moc"

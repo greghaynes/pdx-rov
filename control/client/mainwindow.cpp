@@ -11,7 +11,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
-	, m_connManager(new ConnectionManager)
+	, m_connManager(ConnectionManager::instance())
 {
 	m_joysticksModel = new JoysticksModel(this);
 	m_joysticksTable = new QTableView(this);

@@ -36,7 +36,7 @@ class ConnectionManager
 	Q_OBJECT
 
 	public:
-		ConnectionManager();
+		static ConnectionManager *instance();
 
 		QList<RovConnection*> &connections();
 
@@ -50,6 +50,8 @@ class ConnectionManager
 		void connectionError(QAbstractSocket::SocketError error);
 
 	private:
+		ConnectionManager();
+
 		QList<RovConnection*> m_connections;
 
 };
