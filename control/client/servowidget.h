@@ -27,6 +27,7 @@ class ServoWidget
 		int m_max;
 		int m_min;
 		int m_pos;
+		QString m_str_pos;
 
 		QLabel *posLabel;
 
