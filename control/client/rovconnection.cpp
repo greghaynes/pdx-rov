@@ -37,15 +37,12 @@ bool RovConnection::setVar(const QString &name,
 
 bool RovConnection::reqVar(const QString &name)
 {
+	qDebug() << "requesting value for " << name;
 	QString send;
-	if(state() == ConnectedState)
-	{
-		send = name;
-		send.append("?\n");
-		write(send.toAscii());
-		return true;
-	}
-	return false;
+	send = name;
+	send.append("?\n");
+	write(send.toAscii());
+	return true;
 }
 
 void RovConnection::addMonitor(VarMonitor &monitor)
@@ -65,6 +62,14 @@ void RovConnection::removeMonitor(VarMonitor &monitor)
 	monitor_list.removeAll(&monitor);
 }
 
+void RovConnection::queryVarType(const QString &name)
+{
+	QString send;
+	send = name;
+	send.append(",\n");
+	write(send.toAscii());
+}
+
 void RovConnection::dataRecieved()
 {
 	QString line = readLine();
@@ -82,7 +87,25 @@ void RovConnection::dataRecieved()
 		{
 			m->gotValue(va);
 		}
+		qDebug() << "Got " << vr << va;
 		emit(var(vr, va));
+	}
+	else
+	{
+		eqindex = line.indexOf(',');
+		if(eqindex != -1)
+		{
+			vr = line.left(eqindex);
+			va = line.right(line.size() - eqindex - 1);
+			va.chop(1);
+			QList<VarMonitor*> ms = monitors[vr];
+			VarMonitor *m;
+			Q_FOREACH(m, ms)
+			{
+				m->gotValue(va);
+			}
+			emit(queryTypeResponse(vr, va));
+		}
 	}
 }
 

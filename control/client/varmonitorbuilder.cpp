@@ -1,5 +1,6 @@
 #include "varmonitorbuilder.h"
 #include "rovconnection.h"
+#include "varmonitorcreationprogressdialog.h"
 
 #include <QAbstractSocket>
 #include <QErrorMessage>
@@ -23,11 +24,15 @@ void VarMonitorBuilder::createVarMonitor(RovConnection &conn,
 	}
 	else
 	{
-		
+		VarMonitorCreationProgressDialog *d = new VarMonitorCreationProgressDialog(
+			conn, var);
+		d->exec();
 	}
 }
 
 VarMonitorBuilder::VarMonitorBuilder()
 {
 }
+
+#include "varmonitorbuilder.moc"
 

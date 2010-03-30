@@ -36,13 +36,15 @@ class RovConnection
 
 		void removeMonitor(VarMonitor &monitor);
 
+		void queryVarType(const QString &name);
+
 	private Q_SLOTS:
 		void dataRecieved();
 
 	Q_SIGNALS:
 		void var(const QString &name,
 			const QString &value);
-		void queryType(const QString &name,
+		void queryTypeResponse(const QString &name,
 			const QString &value);
 
 	private:

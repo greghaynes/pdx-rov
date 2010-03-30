@@ -6,6 +6,7 @@
 #include "connectionmanager.h"
 #include "servowidget.h"
 #include "rovconnection.h"
+#include "varmonitorbuilder.h"
 
 #include <QVBoxLayout>
 
@@ -36,9 +37,7 @@ void MainWindow::addVarMonitor()
 	CreateVarMonitorDialog *d = new CreateVarMonitorDialog(*m_connManager, this);
 	if(d->exec())
 	{
-		ServoWidget *widget = new ServoWidget(d->name(), d->name(), d->connection());
-		d->connection().addMonitor(*widget);
-		widget->setVisible(true);
+		VarMonitorBuilder::instance().createVarMonitor(d->connection(), d->name());
 	}
 }
 
