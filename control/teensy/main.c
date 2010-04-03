@@ -31,10 +31,11 @@
 #define LED_ON		(PORTD &= ~(1<<6))
 #define LED_OFF		(PORTD |= (1<<6))
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
+#define CMD_SIZE 3
 
 void send_str(const char *s);
-uint8_t recv_str(char *buf, uint8_t size);
-void parse_and_execute_command(const char *buf, uint8_t num);
+uint8_t recv_str(char *buf);
+void parse_and_execute_command(const char *buf);
 
 #if 0
 // Very simple character echo test
@@ -53,17 +54,40 @@ int main(void)
 // Basic command interpreter for controlling port pins
 int main(void)
 {
-	DDRB |= (1<<7);
+	char buf[32];
+
+	uint8_t n;
+	
+	CPU_PRESCALE(0);
+
 	TCCR0A = 0x00;
 	TCCR0B = 0x05;
-
 	TCCR0A = (1<<COM0A1) | (1<<WGM00);
 	TCCR0B = (1<<CS01);
 
-	OCR0A = 64;
-	
-	while(1);
+	usb_init();
+	while (!usb_configured()) /* wait */ ;
+	_delay_ms(1000);
 
+	while(1)
+	{
+		// Wait for client connection
+		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
+		usb_serial_flush_input();
+
+		// and then listen for commands and process them
+		while (1) {
+			n = recv_str(buf);
+			if (n==255) 
+			{
+				break;
+			}
+			parse_and_execute_command(buf);
+		}
+		
+	}
+
+/*
 	char buf[32];
 	uint8_t n;
 
@@ -77,14 +101,14 @@ int main(void)
 	// without a PC connected to the USB port, this 
 	// will wait forever.
 	usb_init();
-	while (!usb_configured()) /* wait */ ;
+	while (!usb_configured())  wait ;
 	_delay_ms(1000);
 
 
 	while (1) {
 		// wait for the user to run their terminal emulator program
 		// which sets DTR to indicate it is ready to receive.
-		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
+		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) wait ;
 
 		// discard anything that was received prior.  Sometimes the
 		// operating system or other software will send a modem
@@ -108,6 +132,7 @@ int main(void)
 			parse_and_execute_command(buf, n);
 		}
 	}
+	*/
 }
 #endif
 
@@ -131,20 +156,17 @@ void send_str(const char *s)
 // The return value is the number of characters received, or 255 if
 // the virtual serial connection was closed while waiting.
 //
-uint8_t recv_str(char *buf, uint8_t size)
+uint8_t recv_str(char *buf)
 {
 	int16_t r;
 	uint8_t count=0;
 
-	while (count < size) {
+	while (count < CMD_SIZE) {
 		r = usb_serial_getchar();
 		if (r != -1) {
-			if (r == '\r' || r == '\n') return count;
-			if (r >= ' ' && r <= '~') {
-				*buf++ = r;
-				usb_serial_putchar(r);
-				count++;
-			}
+			*buf++ = r;
+			usb_serial_putchar(r);
+			count++;
 		} else {
 			if (!usb_configured() ||
 			  !(usb_serial_get_control() & USB_SERIAL_DTR)) {
@@ -159,10 +181,35 @@ uint8_t recv_str(char *buf, uint8_t size)
 
 // parse a user command and execute it, or print an error message
 //
-void parse_and_execute_command(const char *buf, uint8_t num)
+void parse_and_execute_command(const char *buf)
 {
-	uint8_t port, pin, val;
+	uint8_t type, port, val;
 
+	type = buf[0];
+	port = buf[1];
+	val  = buf[2];
+	
+	switch(type)
+	{
+		case 0:
+			switch(port)
+			{
+				case 4:
+					OCR2A = val;
+					break;
+				case 5:
+					OCR1A = val;
+					break;
+				case 6:
+					OCR1B = val;
+					break;
+				case 7:
+					OCR0A = val;
+					break;
+			}
+	}
+
+	/*
 	if (num < 3) {
 		send_str(PSTR("unrecognized format, 3 chars min req'd\r\n"));
 		return;
@@ -222,6 +269,7 @@ void parse_and_execute_command(const char *buf, uint8_t num)
 	send_str(PSTR("Unknown command \""));
 	usb_serial_putchar(buf[0]);
 	send_str(PSTR("\", must be ? or =\r\n"));
+	*/
 }
 
 
