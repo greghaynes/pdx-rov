@@ -24,10 +24,13 @@ class MainWindow
 	private:
 		void setupToolbars();
 		void setupActions();
+		void setupMenus();
 
 		QToolBar *m_toolBar;
 		QAction *addJoystickAction;
 		QAction *addVarMonitorAction;
+		QAction *addConnectionAction;
+		QAction *quitAction;
 		QTableView *m_joysticksTable;
 		JoysticksModel *m_joysticksModel;
 		ConnectionManager *m_connManager;
