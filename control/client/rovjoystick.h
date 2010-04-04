@@ -10,15 +10,16 @@ class RovJoystick
 {
 
 	public:
+		enum ControlType
+		{
+			Arm,
+			Propulsion
+		};
+
 		RovJoystick(const QString &path,
 			QObject *parent = 0);
 
 		RovConnection &connection();
-
-		void onJoystickEvent(int type,
-			unsigned char number,
-			unsigned int time,
-			short int val);
 
 	protected:
 		void onEvent(int type,
