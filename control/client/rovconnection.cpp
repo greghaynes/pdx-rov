@@ -32,6 +32,8 @@ bool RovConnection::setVar(const QString &name,
 		write(send.toAscii());
 		return true;
 	}
+	else
+		qDebug() << "Cant set var on unconnected connection";
 	return false;
 }
 

@@ -17,6 +17,7 @@ class RovJoystick
 		};
 
 		RovJoystick(const QString &path,
+			RovConnection &conn,
 			QObject *parent = 0);
 
 		RovConnection &connection();

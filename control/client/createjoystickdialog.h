@@ -21,6 +21,7 @@ class CreateJoystickDialog
 
 		QString path() const;
 		int type() const;
+		RovConnection &connection();
 
 	private Q_SLOTS:
 		void connectionAdded(RovConnection &conn);

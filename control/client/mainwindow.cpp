@@ -31,14 +31,18 @@ void MainWindow::addJoystick()
 	CreateJoystickDialog *d = new CreateJoystickDialog(this);
 	if(d->exec())
 	{
-		QJoystick *j;
+		RovJoystick *j = 0;
 		switch(d->type())
 		{
 			case RovJoystick::Arm:
-				j = new ArmJoystick(d->path(), this);
+				j = new ArmJoystick(d->path(), d->connection(), this);
 				break;
 		}
-		m_joysticksModel->addJoystick(*j);
+		
+		if(j)
+		{
+			m_joysticksModel->addJoystick(*j);
+		}
 	}
 }
 

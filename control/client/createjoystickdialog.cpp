@@ -40,6 +40,11 @@ int CreateJoystickDialog::type() const
 	return RovJoystick::Arm;
 }
 
+RovConnection &CreateJoystickDialog::connection()
+{
+	return *m_conn_manager->connections()[ui->connectionComboBox->currentIndex()];
+}
+
 void CreateJoystickDialog::connectionAdded(RovConnection &conn)
 {
 	ui->connectionComboBox->addItem(conn.label());

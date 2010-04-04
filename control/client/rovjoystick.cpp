@@ -5,9 +5,10 @@
 #include <QDebug>
 
 RovJoystick::RovJoystick(const QString &path,
+	RovConnection &conn,
 	QObject *parent)
 	: QJoystick(path, parent)
-	, m_conn(new RovConnection(path, this))
+	, m_conn(&conn)
 {
 }
 
