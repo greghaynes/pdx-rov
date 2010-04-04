@@ -104,10 +104,7 @@ if __name__ == '__main__':
 	server.var_hh.add_query_handler('FW_VERSION', 'FW_Version', sc.version)
 	for a_c in armservo_channel:
 		s = Servo(sc, a_c[1])
-		server.var_hh.add_query_handler('SERVO_POS', 'Arm' + s_c[0], s.position)
-		server.var_hh.add_set_handler('SERVO_POS', 'Arm' + s_c[0], s.set_position)
-	s1 = Servo(sc, 0)
-	server.var_hh.add_query_handler('SERVO_POS', 'Servo1', s1.position)
-	server.var_hh.add_set_handler('SERVO_POS', 'Servo1', s1.set_position)
+		server.var_hh.add_query_handler('SERVO_POS', 'Arm' + a_c[0], s.position)
+		server.var_hh.add_set_handler('SERVO_POS', 'Arm' + a_c[0], s.set_position)
 	asyncore.loop(timeout=2)
 
