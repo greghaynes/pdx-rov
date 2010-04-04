@@ -3,14 +3,13 @@
 
 #include <QDialog>
 
-#include "rovjoystick.h"
-
 namespace Ui
 {
 	class CreateJoystickWidget;
 }
 
 class ConnectionManager;
+class RovConnection;
 
 class CreateJoystickDialog
 	: public QDialog

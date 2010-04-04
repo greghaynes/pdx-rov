@@ -7,6 +7,7 @@
 #include "servowidget.h"
 #include "rovconnection.h"
 #include "varmonitorbuilder.h"
+#include "armjoystick.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
@@ -30,7 +31,13 @@ void MainWindow::addJoystick()
 	CreateJoystickDialog *d = new CreateJoystickDialog(this);
 	if(d->exec())
 	{
-		QJoystick *j = new QJoystick(d->path(), this);
+		QJoystick *j;
+		switch(d->type())
+		{
+			case RovJoystick::Arm:
+				j = new ArmJoystick(d->path(), this);
+				break;
+		}
 		m_joysticksModel->addJoystick(*j);
 	}
 }

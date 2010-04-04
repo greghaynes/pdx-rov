@@ -1,6 +1,7 @@
 #include "createjoystickdialog.h"
 #include "connectionmanager.h"
 #include "rovconnection.h"
+#include "rovjoystick.h"
 
 #include "ui_createjoystickwidget.h"
 
@@ -36,6 +37,7 @@ QString CreateJoystickDialog::path() const
 
 int CreateJoystickDialog::type() const
 {
+	return RovJoystick::Arm;
 }
 
 void CreateJoystickDialog::connectionAdded(RovConnection &conn)
