@@ -10,6 +10,14 @@ LOG_LEVEL = logging.DEBUG
 SC_PATH = ''
 port = 8080
 
+armservo_channel = [
+	('Gripper', 0),
+	('Wrist', 4),
+	('Elbow', 3),
+	('RotatorCuff', 2),
+	('Shoulder', 1)
+	]
+
 class Servo(object):
 	speed = 2
 	min = (0, 300) # (client, servo)
@@ -94,6 +102,10 @@ if __name__ == '__main__':
 	server = varserver.VarServer('', port)
 	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1), server)
 	server.var_hh.add_query_handler('FW_VERSION', 'FW_Version', sc.version)
+	for a_c in armservo_channel:
+		s = Servo(sc, a_c[1])
+		server.var_hh.add_query_handler('SERVO_POS', 'Arm' + s_c[0], s.position)
+		server.var_hh.add_set_handler('SERVO_POS', 'Arm' + s_c[0], s.set_position)
 	s1 = Servo(sc, 0)
 	server.var_hh.add_query_handler('SERVO_POS', 'Servo1', s1.position)
 	server.var_hh.add_set_handler('SERVO_POS', 'Servo1', s1.set_position)
