@@ -1,5 +1,6 @@
 import varserver
 from servo import PositionServo, ServoController
+from prop import PropController, Prop
 import asyncore
 import socket
 import serial
@@ -8,6 +9,8 @@ import sys, getopt
 
 LOG_LEVEL = logging.DEBUG
 SC_PATH = ''
+T1_PATH = ''
+T2_PATH = ''
 port = 8080
 
 armservo_channel = [
@@ -18,27 +21,38 @@ armservo_channel = [
 	('Shoulder', 1)
 	]
 
+teensy1_prop_port = [
+	('FL', 0),
+	('FR', 1),
+	('BL', 2),
+	('BR', 3)
+	]
+
 def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
 
 def showHelp():
-	print 'Usage: python main.py [-h] [-p port] -c device_path'
+	print 'Usage: python main.py [-h] [-p port] -s device_path -t teensy1 -u teensy2'
 
 if __name__ == '__main__':
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'p:c:h', '')
+		opts, args = getopt.getopt(sys.argv[1:], 'p:s:t:u:h', '')
 	except getopt.GetOptError:
 		print 'Invalid argument'
 		showHelp()
 	for opt in opts:
 		if opt[0] == '-p':
 			port = int(opt[1])
-		elif opt[0] == '-c':
+		elif opt[0] == '-s':
 			SC_PATH = opt[1]
+		elif opt[0] == '-t':
+			T1_PATH = opt[1]
+		elif opt[0] == '-u':
+			T2_PATH = opt[1]
 		elif opt[0] == '-h':
 			showHelp()
 			sys.exit(0)
-	if SC_PATH == '':
+	if SC_PATH == '' or T1_PATH == '':
 		showHelp()
 		sys.exit(0)
 	setupLogging()
@@ -48,5 +62,9 @@ if __name__ == '__main__':
 	for a_c in armservo_channel:
 		s = PositionServo(sc, a_c[1], a_c[0])
 		server.addHandler(s)
+	pc = PropController(serial.Serial(T1_PATH, timeout=.1))
+	for p_c in teensy1_prop_port:
+		p = Prop(pc, p_c[1], p_c[0])
+		server.addHandler(p)
 	asyncore.loop(timeout=2)
 
