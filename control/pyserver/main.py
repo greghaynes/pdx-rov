@@ -52,19 +52,24 @@ if __name__ == '__main__':
 		elif opt[0] == '-h':
 			showHelp()
 			sys.exit(0)
-	if SC_PATH == '' or T1_PATH == '':
-		showHelp()
-		sys.exit(0)
 	setupLogging()
 	server = varserver.VarServer('', port)
-	sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1), server)
-	server.addHandler(sc)
-	for a_c in armservo_channel:
-		s = PositionServo(sc, a_c[1], a_c[0])
-		server.addHandler(s)
-	pc = PropController(serial.Serial(T1_PATH, timeout=.1))
-	for p_c in teensy1_prop_port:
-		p = Prop(pc, p_c[1], p_c[0])
-		server.addHandler(p)
+	if SC_PATH != '':
+		logging.info('Using \'%s\' as servo controller device' % SC_PATH)
+		sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1), server)
+		server.addHandler(sc)
+		for a_c in armservo_channel:
+			s = PositionServo(sc, a_c[1], a_c[0])
+			server.addHandler(s)
+	else:
+		logging.info('No servo controller specified')
+	if T1_PATH != '':
+		logging.info('Using \'%s\' as motor controller 1 device' % T1_PATH)
+		pc = PropController(serial.Serial(T1_PATH, timeout=.1))
+		for p_c in teensy1_prop_port:
+			p = Prop(pc, p_c[1], p_c[0])
+			server.addHandler(p)
+	else:
+		logging.info('No motor controller 1 specified')
 	asyncore.loop(timeout=2)
 
