@@ -42,7 +42,7 @@ void ArmJoystick::flushChanges()
 	short int newval;
 	Q_FOREACH(key, m_latest_var_val.keys())
 	{
-		unsigned short mot_val = m_latest_var_val[key] / 10000;
+		unsigned short mot_val = m_latest_var_val[key] / 2000;
 		if(mot_val != 0)
 		{
 			newval = m_var_val[key] + mot_val;
@@ -60,11 +60,12 @@ void ArmJoystick::onAxisEvent(unsigned char number,
 	QString var;
 	switch(number)
 	{
-		case 1:
+		case 0:
 			var = "ArmWrist";
 			break;
-		case 0:
+		case 1:
 			var = "ArmElbow";
+			value = -value;
 			break;
 	}
 

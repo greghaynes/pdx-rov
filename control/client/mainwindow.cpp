@@ -8,6 +8,7 @@
 #include "rovconnection.h"
 #include "varmonitorbuilder.h"
 #include "armjoystick.h"
+#include "propjoystick.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
@@ -37,6 +38,8 @@ void MainWindow::addJoystick()
 			case RovJoystick::Arm:
 				j = new ArmJoystick(d->path(), d->connection(), this);
 				break;
+			case RovJoystick::Propulsion:
+				j = new PropJoystick(d->path(), d->connection(), this);
 		}
 		
 		if(j)

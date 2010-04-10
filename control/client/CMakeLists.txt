@@ -16,7 +16,8 @@ set(client_SRCS
 	varmonitor.cpp
 	servowidget.cpp
 	rovjoystick.cpp
-	armjoystick.cpp)
+	armjoystick.cpp
+	propjoystick.cpp)
 
 set(ui_SRCS
 	createjoystickwidget.ui

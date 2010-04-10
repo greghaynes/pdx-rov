@@ -21,6 +21,7 @@ CreateJoystickDialog::CreateJoystickDialog(QWidget *parent)
 		this, SLOT(connectionAdded(RovConnection&)));
 
 	ui->typeComboBox->addItem("Arm");
+	ui->typeComboBox->addItem("Propulsion");
 
 	
 	RovConnection *conn;
@@ -37,7 +38,7 @@ QString CreateJoystickDialog::path() const
 
 int CreateJoystickDialog::type() const
 {
-	return RovJoystick::Arm;
+	return RovJoystick::Propulsion;
 }
 
 RovConnection &CreateJoystickDialog::connection()
