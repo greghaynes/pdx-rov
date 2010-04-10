@@ -30,11 +30,15 @@ class VarClient(asyncore.dispatcher):
 			self.socket.send(item)
 		del self.out_buffer[:]
 	def handle_read(self):
-		self.buffer += self.socket.recv(1024)
-		tmp_buff = self.buffer.split('\n')
-		self.buffer = tmp_buff.pop()
-		for line in tmp_buff:
-			self.handle_line(line)
+		buff = self.socket.recv(1024)
+		if len(buff) == 0:
+			self.close()
+		else:
+			self.buffer += buff
+			tmp_buff = self.buffer.split('\n')
+			self.buffer = tmp_buff.pop()
+			for line in tmp_buff:
+				self.handle_line(line)
 	def handle_close(self):
 		logging.debug('Closed connection')
 		self.close()
