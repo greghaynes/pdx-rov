@@ -47,42 +47,50 @@ void PropJoystick::timeout()
 	}
 	else
 	{
+		QString pValStr;
 		if(abs(axis_vals[0]) > abs(axis_vals[1]))
 		{
+			pValStr = QString::number(joyToPropVal(axis_vals[0]));
 			// Moving left-right
 			if(axis_vals[0] > 0)
 			{
 				// Right
-				connection().setVar("FL", "400");
-				connection().setVar("BL", "400");
+				connection().setVar("FL", pValStr);
+				connection().setVar("BL", pValStr);
 			}
 			else
 			{
 				// Left
-				connection().setVar("FR", "400");
-				connection().setVar("BR", "400");
+				connection().setVar("FR", pValStr);
+				connection().setVar("BR", pValStr);
 			}
 		}
 		else
 		{
+			pValStr = QString::number(joyToPropVal(axis_vals[1]));
 			// Moving forward-back
 			if(axis_vals[1] < 0)
 			{
 				// Forward
-				connection().setVar("FL", "400");
-				connection().setVar("FR", "400");
+				connection().setVar("FL", pValStr);
+				connection().setVar("FR", pValStr);
 			}
 			else
 			{
 				// Back
-				connection().setVar("BL", "400");
-				connection().setVar("BR", "400");
+				connection().setVar("BL", pValStr);
+				connection().setVar("BR", pValStr);
 			}
 		}
 	}
 }
 
-short int PropJoystick::abs(short int val)
+short int PropJoystick::joyToPropVal(short int joyVal) const
+{
+	return joyVal / 70;
+}
+
+short int PropJoystick::abs(short int val) const
 {
 	if(val < 0)
 		return -val;

@@ -25,7 +25,8 @@ class PropJoystick
 		void timeout();
 
 	private:
-		short int abs(short int);
+		short int abs(short int) const;
+		short int joyToPropVal(short int) const;
 
 		short int axis_vals[4];
 
