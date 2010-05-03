@@ -38,7 +38,9 @@ QString CreateJoystickDialog::path() const
 
 int CreateJoystickDialog::type() const
 {
-	return RovJoystick::Propulsion;
+	if(ui->typeComboBox->currentIndex() != 0)
+		return RovJoystick::Propulsion;
+	return RovJoystick::Arm;
 }
 
 RovConnection &CreateJoystickDialog::connection()
