@@ -14,11 +14,11 @@ T2_PATH = ''
 port = 8080
 
 armservo_channel = [
-	('Gripper', 0),
-	('Wrist', 4),
-	('Elbow', 3),
-	('RotatorCuff', 2),
-	('Shoulder', 1)
+	('ArmGripper', 0),
+	('ArmWrist', 4),
+	('ArmElbow', 3),
+	('ArmRotatorCuff', 2),
+	('ArmShoulder', 1)
 	]
 
 teensy1_prop_port = [
@@ -32,7 +32,7 @@ def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
 
 def showHelp():
-	print 'Usage: python main.py [-h] [-p port] -s device_path -t teensy1 -u teensy2'
+	print 'Usage: python main.py [-h] [-p port] -s sc_path -t teensy1 -u teensy2'
 
 if __name__ == '__main__':
 	try:

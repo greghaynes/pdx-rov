@@ -3,8 +3,8 @@ import struct
 
 class PositionServo(varserver.VarHandler):
 	default_speed = 2
-	min = 300
-	max = 1200
+	min = 384
+	max = 1120
 	def __init__(self, servo_controller, channel, var_name):
 		varserver.VarHandler.__init__(self, 'SERVO_POS', var_name)
 		self.servo_controller = servo_controller
