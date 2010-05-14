@@ -31,11 +31,10 @@
 #define LED_ON		(PORTD &= ~(1<<6))
 #define LED_OFF		(PORTD |= (1<<6))
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
-#define CMD_SIZE 3
 
 void send_str(const char *s);
-uint8_t recv_str(char *buf);
-void parse_and_execute_command(const char *buf);
+uint8_t recv_str(char *buf, uint8_t size);
+void parse_and_execute_command(const char *buf, uint8_t num);
 
 #if 0
 // Very simple character echo test
@@ -51,45 +50,125 @@ int main(void)
 
 #else
 
+void setup_pwms(void)
+{
+	// Timer 0
+	// Set pwm ports to output
+	DDRB |= (1<<5) | (1<<6) | (1<<7);
+
+	TCCR1A = (0<<COM1A0) | (1<<COM1A1);
+	TCCR1A |= (0<<COM1B0) | (1<<COM1B1);
+	TCCR1A |= (0<<COM1C0) | (1<<COM1C1);
+	TCCR1A |= (0<<WGM10) | (1<<WGM11);
+
+	TCCR1B = (1<<CS10);
+
+	TCCR1C = 0;
+
+	// Timer 3
+	// Set pwm ports to output
+	DDRC |= (1<<6);
+
+	TCCR3A = (0<<COM3A0) | (1<<COM3A1);
+	TCCR3A |= (0<<COM3B0) | (1<<COM3B1);
+	TCCR3A |= (0<<COM3C0) | (1<<COM3C1);
+	TCCR3A |= (0<<WGM30) | (1<<WGM31);
+
+	TCCR3B = (1<<CS30);
+
+	TCCR3C = 0;
+
+	// Initial duty cycle
+	OCR1A = 0x010;
+	OCR1B = 0x048;
+	OCR1C = 0x100;
+
+	OCR3A = 0x1F0;
+}
+
+/**
+ * @breif Handle a set pwm command
+ */
+void handle_set_pwm_command(uint8_t port, uint16_t val)
+{
+	switch(port)
+	{
+		case 0:
+			OCR1A = val;
+			break;
+		case 1:
+			OCR1B = val;
+			break;
+		case 2:
+			OCR1C = val;
+			break;
+		case 3:
+			OCR3A = val;
+			break;
+		default:
+			send_str(PSTR("INVALID_PORT"));
+	}
+}
+
+void handle_command(const char *str, uint8_t len)
+{
+	uint8_t cmd, port, valh, vall;
+	
+	if(len != 4)
+	{
+		send_str(PSTR("INVALID_COMMAND_LENGTH"));
+		return;
+	}
+
+	cmd = str[0];
+	port = str[1];
+	valh = str[2];
+	vall = str[3];
+
+	uint16_t val = (valh * 256) + vall;
+
+	switch(cmd)
+	{
+		case 0:
+			handle_set_pwm_command(port, val);
+			break;
+		default:
+			send_str(PSTR("INVALID_COMMAND_CODE"));
+	}
+	send_str(PSTR("PWM val set\n"));
+	
+}
+
 // Basic command interpreter for controlling port pins
 int main(void)
 {
+	setup_pwms();
+
 	char buf[32];
-
 	uint8_t n;
-	
-	CPU_PRESCALE(0);
 
-	TCCR0A = 0x00;
-	TCCR0B = 0x05;
-	TCCR0A = (1<<COM0A1) | (1<<WGM00);
-	TCCR0B = (1<<CS01);
+	CPU_PRESCALE(2);
+	LED_CONFIG;
+	LED_ON;
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
-	while(1)
-	{
-		// Wait for client connection
+	while (1) {
 		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
 		usb_serial_flush_input();
 
-		// and then listen for commands and process them
 		while (1) {
-			n = recv_str(buf);
-			if (n==255) 
-			{
-				break;
-			}
-			parse_and_execute_command(buf);
+			n = recv_str(buf, sizeof(buf));
+			if (n == 255) break;
+			send_str(PSTR("\r\n"));
+			handle_command(buf, n);
 		}
 		
 	}
 
-/*
-	char buf[32];
-	uint8_t n;
+#if 0
 
 	// set for 16 MHz clock, and turn on the LED
 	CPU_PRESCALE(0);
@@ -101,14 +180,14 @@ int main(void)
 	// without a PC connected to the USB port, this 
 	// will wait forever.
 	usb_init();
-	while (!usb_configured())  wait ;
+	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
 
 	while (1) {
 		// wait for the user to run their terminal emulator program
 		// which sets DTR to indicate it is ready to receive.
-		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) wait ;
+		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
 
 		// discard anything that was received prior.  Sometimes the
 		// operating system or other software will send a modem
@@ -132,7 +211,7 @@ int main(void)
 			parse_and_execute_command(buf, n);
 		}
 	}
-	*/
+#endif
 }
 #endif
 
@@ -156,16 +235,17 @@ void send_str(const char *s)
 // The return value is the number of characters received, or 255 if
 // the virtual serial connection was closed while waiting.
 //
-uint8_t recv_str(char *buf)
+uint8_t recv_str(char *buf, uint8_t size)
 {
 	int16_t r;
 	uint8_t count=0;
 
-	while (count < CMD_SIZE) {
+	while (count < size) {
 		r = usb_serial_getchar();
 		if (r != -1) {
+			if (r == '\r' || r == '\n') return count;
 			*buf++ = r;
-			usb_serial_putchar(r);
+			//usb_serial_putchar(r);
 			count++;
 		} else {
 			if (!usb_configured() ||
@@ -181,35 +261,10 @@ uint8_t recv_str(char *buf)
 
 // parse a user command and execute it, or print an error message
 //
-void parse_and_execute_command(const char *buf)
+void parse_and_execute_command(const char *buf, uint8_t num)
 {
-	uint8_t type, port, val;
+	uint8_t port, pin, val;
 
-	type = buf[0];
-	port = buf[1];
-	val  = buf[2];
-	
-	switch(type)
-	{
-		case 0:
-			switch(port)
-			{
-				case 4:
-					OCR2A = val;
-					break;
-				case 5:
-					OCR1A = val;
-					break;
-				case 6:
-					OCR1B = val;
-					break;
-				case 7:
-					OCR0A = val;
-					break;
-			}
-	}
-
-	/*
 	if (num < 3) {
 		send_str(PSTR("unrecognized format, 3 chars min req'd\r\n"));
 		return;
@@ -269,7 +324,6 @@ void parse_and_execute_command(const char *buf)
 	send_str(PSTR("Unknown command \""));
 	usb_serial_putchar(buf[0]);
 	send_str(PSTR("\", must be ? or =\r\n"));
-	*/
 }
 
 
