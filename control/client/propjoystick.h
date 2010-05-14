@@ -27,8 +27,10 @@ class PropJoystick
 	private:
 		short int abs(short int) const;
 		short int joyToPropVal(short int) const;
+		short int absmax(short int*) const;
 
-		short int axis_vals[4];
+		short int vert_axis_vals[2];
+		short int lat_axis_vals[2];
 
 };
 
