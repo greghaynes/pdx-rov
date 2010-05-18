@@ -76,25 +76,46 @@ void setup_pwms(void)
 /**
  * @breif Handle a set pwm command
  */
-void handle_set_pwm_command(uint8_t port, uint16_t val)
+void handle_set_pwm_command(uint8_t port, uint8_t val)
 {
+	usb_serial_putchar('\x04');
+	usb_serial_putchar(port);
 	switch(port)
 	{
 		case 0:
-			OCR1A = val;
+			OCR0A = val;
 			break;
 		case 1:
-			OCR1B = val;
+			OCR0B = val;
 			break;
 		case 2:
-			OCR1C = val;
+			OCR1A = val;
 			break;
 		case 3:
+			OCR1B = val;
+			break;
+		case 4:
+			OCR2A = val;
+			break;
+		case 5:
+			OCR2B = val;
+			break;
+		case 6:
 			OCR3A = val;
 			break;
+		case 7:
+			OCR3B = val;
+			break;
+		case 8:
+			OCR3C = val;
+			break;
 		default:
-			send_str(PSTR("INVALID_PORT"));
+			usb_serial_putchar('\x01');
+			usb_serial_putchar('\n');
+			return;
 	}
+	usb_serial_putchar('\x00');
+	usb_serial_putchar('\n');
 }
 
 void handle_version_command(void)
@@ -119,6 +140,13 @@ void handle_ping_command(const char *str, uint8_t len)
 	usb_serial_putchar('\n');
 }
 
+void handle_pwm_ports_command(void)
+{
+	usb_serial_putchar('\x03');
+	usb_serial_putchar('\x00');
+	send_str(PSTR("\x01\x02\x03\x04\x05\x06\x07\x08\n"));
+}
+
 void handle_command(const char *str, uint8_t len)
 {
 	uint8_t cmd, port, valh, vall;
@@ -135,6 +163,12 @@ void handle_command(const char *str, uint8_t len)
 			break;
 		case 1:
 			handle_ping_command(str, len);
+			break;
+		case 3:
+			handle_pwm_ports_command();
+			break;
+		case 4:
+			handle_set_pwm_command(str[1], str[2]);
 			break;
 		default:
 			send_str(PSTR("INVALID_COMMAND_CODE"));
