@@ -103,6 +103,22 @@ void handle_version_command(void)
 	send_str(PSTR("Motor Controller 1.0\n"));
 }
 
+void handle_ping_command(const char *str, uint8_t len)
+{
+	const char *data_itr;
+	uint8_t ndx = 1;
+
+	data_itr = str;
+
+	usb_serial_putchar('\x02');
+	while(ndx < len)
+	{
+		usb_serial_putchar(data_itr[ndx]);
+		++ndx;
+	}
+	usb_serial_putchar('\n');
+}
+
 void handle_command(const char *str, uint8_t len)
 {
 	uint8_t cmd, port, valh, vall;
@@ -117,6 +133,9 @@ void handle_command(const char *str, uint8_t len)
 		case 0:
 			handle_version_command();
 			break;
+		case 1:
+			handle_ping_command(str, len);
+			break;
 		default:
 			send_str(PSTR("INVALID_COMMAND_CODE"));
 	}
@@ -125,7 +144,6 @@ void handle_command(const char *str, uint8_t len)
 int main(void)
 {
 	setup_pwms();
-	while(1);
 
 	char buf[32];
 	uint8_t n;
