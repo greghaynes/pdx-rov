@@ -30,6 +30,31 @@ void send_str(const char *s);
 uint8_t recv_str(char *buf, uint8_t size);
 void parse_and_execute_command(const char *buf, uint8_t num);
 
+void set_default_duty_cycles(void)
+{
+	OCR0A = 0x00;
+	OCR0B = 0x00;
+
+	OCR2A = 0x00;
+	OCR2B = 0x00;
+
+	OCR1AH = 0x00;
+	OCR1AL = 0x00; // Register used by 8bit pwm
+	OCR1BH = 0x00;
+	OCR1BL = 0x00; // Register used by 8bit pwm
+	OCR1CH = 0x00;
+	OCR1CL = 0x00; // Covered by OCR0A
+
+	OCR3AH = 0x00;
+	OCR3AL = 0x00; // Register used by 8bit pwm
+	OCR3BH = 0x00;
+	OCR3BL = 0x00; // Register used by 8bit pwm
+	OCR3CH = 0x00;
+	OCR3CL = 0x00; // Register used by 8bit pwm
+
+	set_default_duty_cycles();
+}
+
 void setup_pwms(void)
 {
 	// Timer 0
@@ -41,36 +66,16 @@ void setup_pwms(void)
 	TCCR0A = (1 << COM0A1) | (1 << COM0B1) | (1 << WGM00) | (1 << WGM01);
 	TCCR0B = (1 << CS00);
 
-	OCR0A = 0x00;
-	OCR0B = 0x00;
-
 	TCCR2A = (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20) | (1 << WGM21);
 	TCCR2B = (1 << CS20);
-
-	OCR2A = 0x00;
-	OCR2B = 0x00;
 
 	TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10);
 	TCCR1B = (1 << WGM12) | (1 << CS10);
 	TCCR1C = 0;
 
-	OCR1AH = 0x00;
-	OCR1AL = 0x00; // Register used by 8bit pwm
-	OCR1BH = 0x00;
-	OCR1BL = 0x00; // Register used by 8bit pwm
-	OCR1CH = 0x00;
-	OCR1CL = 0x00; // Covered by OCR0A
-
 	TCCR3A = (1 << COM3A1) | (1 << COM3B1) | (1 << WGM30);
 	TCCR3B = (1 << WGM32) | (1 << CS30);
 	TCCR3C = 0;
-
-	OCR3AH = 0x00;
-	OCR3AL = 0x00; // Register used by 8bit pwm
-	OCR3BH = 0x00;
-	OCR3BL = 0x00; // Register used by 8bit pwm
-	OCR3CH = 0x00;
-	OCR3CL = 0x00; // Register used by 8bit pwm
 }
 
 /**
@@ -149,14 +154,10 @@ void handle_pwm_ports_command(void)
 
 void handle_command(const char *str, uint8_t len)
 {
-	uint8_t cmd, port, valh, vall;
-	
 	if(len == 0)
 		return;
 
-	cmd = str[0];
-
-	switch(cmd)
+	switch(str[0])
 	{
 		case 0:
 			handle_version_command();
@@ -177,18 +178,17 @@ void handle_command(const char *str, uint8_t len)
 
 int main(void)
 {
-	setup_pwms();
-
 	char buf[32];
 	uint8_t n;
 
-	CPU_PRESCALE(0);
+	CPU_PRESCALE(2);
+	setup_pwms();
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
-	while (1) {
+	while (1){
 		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
 		usb_serial_flush_input();
 
