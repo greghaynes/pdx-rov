@@ -11,6 +11,7 @@ set(client_SRCS
 	motorpanel.cpp
 	servodial.cpp
 	armpanel.cpp
+	sensorpanel.cpp
 	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
 	connectionmanager.cpp
@@ -25,7 +26,8 @@ set(client_SRCS
 set(ui_SRCS
 	createjoystickwidget.ui
 	createvarmonitorwidget.ui
-	createconnectionwidget.ui)
+	createconnectionwidget.ui
+	sensorspanel.ui)
 
 QT4_AUTOMOC(${client_SRCS})
 QT4_WRAP_UI(client_SRCS ${ui_SRCS})

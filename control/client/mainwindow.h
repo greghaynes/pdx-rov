@@ -7,6 +7,7 @@
 #include <QTableView>
 
 class ConnectionManager;
+class SensorPanel;
 class MotorPanel;
 class ArmPanel;
 
@@ -35,6 +36,7 @@ class MainWindow
 		QAction *quitAction;
 	
 		ConnectionManager *m_connManager;
+		SensorPanel *m_sensorPanel;
 		MotorPanel *m_motorPanel;
 		ArmPanel *m_armPanel;
 

@@ -8,6 +8,7 @@
 #include "varmonitorbuilder.h"
 #include "armjoystick.h"
 #include "propjoystick.h"
+#include "sensorpanel.h"
 #include "motorpanel.h"
 #include "armpanel.h"
 
@@ -22,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	QMdiArea *mdiArea = new QMdiArea();
 	setCentralWidget(mdiArea);
+
+	m_sensorPanel = new SensorPanel();
+	QMdiSubWindow *subwinsensorPanel = mdiArea->addSubWindow(m_sensorPanel);
 
 	m_motorPanel = new MotorPanel();
 	QMdiSubWindow *subwinMotorPanel = mdiArea->addSubWindow(m_motorPanel);
