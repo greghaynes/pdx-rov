@@ -2,13 +2,13 @@
 #include "createjoystickdialog.h"
 #include "createvarmonitordialog.h"
 #include "qjoystick.h"
-#include "joysticksmodel.h"
 #include "connectionmanager.h"
 #include "servowidget.h"
 #include "rovconnection.h"
 #include "varmonitorbuilder.h"
 #include "armjoystick.h"
 #include "propjoystick.h"
+#include "motorpanel.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
@@ -18,10 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, m_connManager(ConnectionManager::instance())
 {
-	m_joysticksModel = new JoysticksModel(this);
-	m_joysticksTable = new QTableView(this);
-	m_joysticksTable->setModel(m_joysticksModel);
-	setCentralWidget(m_joysticksTable);
+	MotorPanel *panel = new MotorPanel();
+	panel->setVisible(true);
+
 	setupActions();
 	setupMenus();
 	setupToolbars();
@@ -40,11 +39,6 @@ void MainWindow::addJoystick()
 				break;
 			case RovJoystick::Propulsion:
 				j = new PropJoystick(d->path(), d->connection(), this);
-		}
-		
-		if(j)
-		{
-			m_joysticksModel->addJoystick(*j);
 		}
 	}
 }

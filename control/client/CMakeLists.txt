@@ -6,9 +6,9 @@ set(client_SRCS
 	main.cpp
 	rovconnection.cpp
 	qjoystick.cpp
-	joysticksmodel.cpp
 	mainwindow.cpp
 	motorslider.cpp
+	motorpanel.cpp
 	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
 	connectionmanager.cpp

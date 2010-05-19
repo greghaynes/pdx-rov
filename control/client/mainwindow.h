@@ -32,7 +32,6 @@ class MainWindow
 		QAction *addConnectionAction;
 		QAction *quitAction;
 		QTableView *m_joysticksTable;
-		JoysticksModel *m_joysticksModel;
 		ConnectionManager *m_connManager;
 
 };
