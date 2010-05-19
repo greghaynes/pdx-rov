@@ -9,17 +9,25 @@
 #include "armjoystick.h"
 #include "propjoystick.h"
 #include "motorpanel.h"
+#include "armpanel.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMdiArea>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, m_connManager(ConnectionManager::instance())
 {
-	MotorPanel *panel = new MotorPanel();
-	panel->setVisible(true);
+	QMdiArea *mdiArea = new QMdiArea();
+	setCentralWidget(mdiArea);
+
+	m_motorPanel = new MotorPanel();
+	QMdiSubWindow *subwinMotorPanel = mdiArea->addSubWindow(m_motorPanel);
+
+	m_armPanel = new ArmPanel();
+	QMdiSubWindow *subwinArmPanel = mdiArea->addSubWindow(m_armPanel);
 
 	setupActions();
 	setupMenus();

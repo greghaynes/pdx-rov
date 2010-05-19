@@ -6,8 +6,9 @@
 #include <QAction>
 #include <QTableView>
 
-class JoysticksModel;
 class ConnectionManager;
+class MotorPanel;
+class ArmPanel;
 
 class MainWindow
 	: public QMainWindow
@@ -27,12 +28,15 @@ class MainWindow
 		void setupMenus();
 
 		QToolBar *m_toolBar;
+
 		QAction *addJoystickAction;
 		QAction *addVarMonitorAction;
 		QAction *addConnectionAction;
 		QAction *quitAction;
-		QTableView *m_joysticksTable;
+	
 		ConnectionManager *m_connManager;
+		MotorPanel *m_motorPanel;
+		ArmPanel *m_armPanel;
 
 };
 

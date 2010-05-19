@@ -9,6 +9,8 @@ set(client_SRCS
 	mainwindow.cpp
 	motorslider.cpp
 	motorpanel.cpp
+	servodial.cpp
+	armpanel.cpp
 	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
 	connectionmanager.cpp
