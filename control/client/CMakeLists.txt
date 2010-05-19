@@ -8,6 +8,7 @@ set(client_SRCS
 	qjoystick.cpp
 	joysticksmodel.cpp
 	mainwindow.cpp
+	motorslider.cpp
 	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
 	connectionmanager.cpp
