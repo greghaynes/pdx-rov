@@ -74,6 +74,20 @@ void setup_pwms(void)
 	OCR1A=2000;
 }
 
+void setup_adc(void)
+{
+	ADMUX = (1 << REFS1) | (1 << REFS0);
+
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADCSRB = (1 << ADTS2) | (1 << ADTS1);
+
+	DIDR0 = ADC0D;
+}
+
+#define START_ADC ADCSRA |= (1 << ADSC)
+
+#define ADC_COMPLETE (ADCSRA & (1 << ADIF))
+
 /**
  * @breif Handle a set pwm command
  */
@@ -179,18 +193,21 @@ int main(void)
 
 	CPU_PRESCALE(0);
 	setup_pwms();
+	setup_adc();
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
-
 	while(1){
-		OCR1A=2000;
-		_delay_ms(6000);
-		OCR1A=1000;
-		_delay_ms(6000);
+		START_ADC;
+		while(!ADC_COMPLETE);
+		usb_serial_putchar(ADCL);
+		usb_serial_putchar(ADCH);
+		usb_serial_putchar('\n');
+		_delay_ms(100);
 	}
+
 #if 0
 	while (1){
 		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
