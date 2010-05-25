@@ -20,6 +20,7 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <avr/interrupt.h>
 #include <stdint.h>
 #include <avr/delay.h>
 #include "usb_serial.h"
@@ -29,6 +30,18 @@
 void send_str(const char *s);
 uint8_t recv_str(char *buf, uint8_t size);
 void parse_and_execute_command(const char *buf, uint8_t num);
+
+#define START_ADC ADCSRA |= (1 << ADSC)
+
+#define ADC_COMPLETE (ADCSRA & (1 << ADIF))
+
+ISR(ADC_vect)
+{
+	usb_serial_putchar(ADCL);
+	usb_serial_putchar(ADCH);
+	usb_serial_putchar('\n');
+	START_ADC;
+}
 
 void set_default_duty_cycles(void)
 {
@@ -78,15 +91,11 @@ void setup_adc(void)
 {
 	ADMUX = (1 << REFS1) | (1 << REFS0);
 
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0) | (1 << ADIE);
 	ADCSRB = (1 << ADTS2) | (1 << ADTS1);
 
 	DIDR0 = ADC0D;
 }
-
-#define START_ADC ADCSRA |= (1 << ADSC)
-
-#define ADC_COMPLETE (ADCSRA & (1 << ADIF))
 
 /**
  * @breif Handle a set pwm command
@@ -199,14 +208,8 @@ int main(void)
 	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
-	while(1){
-		START_ADC;
-		while(!ADC_COMPLETE);
-		usb_serial_putchar(ADCL);
-		usb_serial_putchar(ADCH);
-		usb_serial_putchar('\n');
-		_delay_ms(100);
-	}
+	START_ADC;
+	while(1);
 
 #if 0
 	while (1){
