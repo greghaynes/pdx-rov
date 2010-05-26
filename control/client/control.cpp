@@ -1,11 +1,11 @@
 #include <QApplication>
-#include "mainwindow.h"
+#include "controlwindow.h"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	
-	MainWindow *mainWindow = new MainWindow();
+	ControlWindow *mainWindow = new ControlWindow();
 	mainWindow->setVisible(true);
 	
 	return app.exec();

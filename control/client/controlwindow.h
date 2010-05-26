@@ -1,23 +1,25 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef CONTROLWINDOW_H
+#define CONTROLWINDOW_H
 
 #include <QMainWindow>
 #include <QToolBar>
 #include <QAction>
 #include <QTableView>
 
+class QWebView;
+
 class ConnectionManager;
 class SensorPanel;
 class MotorPanel;
 class ArmPanel;
 
-class MainWindow
+class ControlWindow
 	: public QMainWindow
 {
 	Q_OBJECT
 
 	public:
-		MainWindow(QWidget *parent = 0);
+		ControlWindow(QWidget *parent = 0);
 
 	private Q_SLOTS:
 		void addJoystick();
@@ -35,10 +37,11 @@ class MainWindow
 		QAction *addConnectionAction;
 		QAction *quitAction;
 	
-		ConnectionManager *m_connManager;
-		SensorPanel *m_sensorPanel;
-		MotorPanel *m_motorPanel;
 		ArmPanel *m_armPanel;
+		SensorPanel *m_sensorPanel;
+		QWebView *cam1View;
+
+		ConnectionManager *m_connManager;
 
 };
 

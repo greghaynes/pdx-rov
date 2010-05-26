@@ -39,7 +39,7 @@ MotorPanel::MotorPanel(QWidget *parent)
 
 	vertGroupBox->setLayout(vertSliderLayout);
 
-	QVBoxLayout *vlayout = new QVBoxLayout();
+	QHBoxLayout *vlayout = new QHBoxLayout();
 	vlayout->addWidget(latGroupBox);
 	vlayout->addWidget(vertGroupBox);
 

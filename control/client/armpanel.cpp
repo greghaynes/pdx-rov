@@ -1,14 +1,14 @@
 #include "armpanel.h"
 #include "servodial.h"
 
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 ArmPanel::ArmPanel(QWidget *parent)
 	: QWidget(parent)
 {
 	setWindowTitle("Arm");
 
-	QHBoxLayout *hlayout = new QHBoxLayout();
+	QVBoxLayout *hlayout = new QVBoxLayout();
 	hlayout->addWidget(new ServoDial("Shoulder"));
 	hlayout->addWidget(new ServoDial("Elbow"));
 	hlayout->addWidget(new ServoDial("Wrist"));

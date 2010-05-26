@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "pilotwindow.h"
 #include "createjoystickdialog.h"
 #include "createvarmonitordialog.h"
 #include "qjoystick.h"
@@ -16,29 +16,36 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QUrl>
+#include <QWebView>
 
-MainWindow::MainWindow(QWidget *parent)
+PilotWindow::PilotWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, m_connManager(ConnectionManager::instance())
 {
 	QMdiArea *mdiArea = new QMdiArea();
 	setCentralWidget(mdiArea);
 
-	m_sensorPanel = new SensorPanel();
-	QMdiSubWindow *subwinsensorPanel = mdiArea->addSubWindow(m_sensorPanel);
-
 	m_motorPanel = new MotorPanel();
 	QMdiSubWindow *subwinMotorPanel = mdiArea->addSubWindow(m_motorPanel);
 
-	m_armPanel = new ArmPanel();
-	QMdiSubWindow *subwinArmPanel = mdiArea->addSubWindow(m_armPanel);
+	cam1View = new QWebView();
+	cam1View->load(QUrl("http://google.com"));
+	QMdiSubWindow *subwinCam1 = mdiArea->addSubWindow(cam1View);
+	subwinCam1->resize(640, 480);
+
+	cam2View = new QWebView();
+	cam2View->load(QUrl("http://google.com"));
+	QMdiSubWindow *subwinCam2 = mdiArea->addSubWindow(cam2View);
+	subwinCam2->resize(640, 480);
 
 	setupActions();
 	setupMenus();
 	setupToolbars();
 }
 
-void MainWindow::addJoystick()
+void PilotWindow::addJoystick()
 {
 	CreateJoystickDialog *d = new CreateJoystickDialog(this);
 	if(d->exec())
@@ -55,7 +62,7 @@ void MainWindow::addJoystick()
 	}
 }
 
-void MainWindow::addVarMonitor()
+void PilotWindow::addVarMonitor()
 {
 	CreateVarMonitorDialog *d = new CreateVarMonitorDialog(*m_connManager, this);
 	if(d->exec())
@@ -64,7 +71,7 @@ void MainWindow::addVarMonitor()
 	}
 }
 
-void MainWindow::setupToolbars()
+void PilotWindow::setupToolbars()
 {
 	m_toolBar = new QToolBar(this);
 	m_toolBar->addAction(addConnectionAction);
@@ -74,7 +81,7 @@ void MainWindow::setupToolbars()
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
 }
 
-void MainWindow::setupMenus()
+void PilotWindow::setupMenus()
 {
 	QMenu *fileMenu = new QMenu("&File", this);
 	fileMenu->addAction(addConnectionAction);
@@ -85,7 +92,7 @@ void MainWindow::setupMenus()
 	menuBar()->addMenu(fileMenu);
 }
 
-void MainWindow::setupActions()
+void PilotWindow::setupActions()
 {
 	quitAction = new QAction("&Quit", this);
 	quitAction->setShortcut(QKeySequence::Close);
@@ -103,5 +110,5 @@ void MainWindow::setupActions()
 		this, SLOT(addVarMonitor()));
 }
 
-#include "mainwindow.moc"
+#include "pilotwindow.moc"
 
