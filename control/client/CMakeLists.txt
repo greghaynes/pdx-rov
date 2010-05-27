@@ -38,7 +38,7 @@ set(ui_SRCS
 QT4_AUTOMOC(${common_SRCS})
 QT4_AUTOMOC(${pilot_SRCS})
 QT4_AUTOMOC(${control_SRCS})
-QT4_WRAP_UI(client_SRCS ${ui_SRCS})
+QT4_WRAP_UI(common_SRCS ${ui_SRCS})
 
 add_executable(pilot ${common_SRCS} ${pilot_SRCS})
 target_link_libraries(pilot ${QT_LIBRARIES})
