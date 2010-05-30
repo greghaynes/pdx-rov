@@ -60,7 +60,3 @@ class Propulsion(object):
 					magnitude
 					)
 
-def setup(server): 
-	prop_module = Propulsion(motorcontroller.motorcontroller)
-	server.addModule(prop_module)
-

@@ -10,7 +10,8 @@ def create_command(module_name, command_name, args={}):
 	return {
 		'module': module_name,
 		'command': command_name,
-		'arguments': args}
+		'arguments': args
+		}
 
 error_command = create_command('core', 'error')
 
@@ -20,16 +21,21 @@ class RequestError(Exception):
 	def __str__(self):
 		return repr(self.desc)
 
-class InvalidModuleError(Exception):
+class InvalidModuleError(RequestError):
 	def __init__(self, command):
 		RequestError.__init__(self, command)
 
-class InvalidCommandError(Exception):
+class InvalidCommandError(RequestError):
 	def __init__(self, command):
 		RequestError.__init__(self, command)
+
+class InvalidArgumentError(RequestError):
+	def __init__(self, argument):
+		RequestError.__init__(self, argument)
 
 class JsonClient(asyncore.dispatcher):
 	def __init__(self, server, socket):
+		asyncore.dispatcher.__init__(socket)
 		self.server = server
 		self.ibuffer = ''
 		self.obuffer = []
@@ -62,8 +68,10 @@ class JsonServer(asyncore.dispatcher):
 	def __init__(self, host, port):
 		asyncore.dispatcher.__init__(self)
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.bind((host, port))
 		self.clients = []
 		self.modules = {}
+		self.listen(1024)
 	def handle_accept(self):
 		conn = self.socket.accept()
 		self.clients.append(VarClient(self, conn[0]))
@@ -77,4 +85,11 @@ class JsonServer(asyncore.dispatcher):
 			client.send_response(1, error_command)
 		except InvalidCommandError:
 			client.send_response(2, error_command)
+	def add_module(self, module_name, module):
+		self.modules[module_name] = module
+	def writable(self):
+		return False
+	def handle_close(self):
+		print 'close'
+		self.close()
 

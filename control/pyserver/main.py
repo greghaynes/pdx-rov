@@ -1,6 +1,6 @@
-import varserver
-from servo import PositionServo, ServoController
-from prop import PropController, Prop
+from jsonserver import JsonServer
+from propulsion import Propulsion
+from teensy import Teensy
 import asyncore
 import socket
 import serial
@@ -12,21 +12,6 @@ SC_PATH = ''
 T1_PATH = ''
 T2_PATH = ''
 port = 8080
-
-armservo_channel = [
-	('ArmGripper', 0),
-	('ArmWrist', 4),
-	('ArmElbow', 3),
-	('ArmRotatorCuff', 2),
-	('ArmShoulder', 1)
-	]
-
-teensy1_prop_port = [
-	('FL', 0),
-	('FR', 1),
-	('BL', 2),
-	('BR', 3)
-	]
 
 def setupLogging():
 	logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(name)s: %(message)s")
@@ -53,23 +38,11 @@ if __name__ == '__main__':
 			showHelp()
 			sys.exit(0)
 	setupLogging()
-	server = varserver.VarServer('', port)
-	if SC_PATH != '':
-		logging.info('Using \'%s\' as servo controller device' % SC_PATH)
-		sc = ServoController(serial.Serial(SC_PATH, 2400, timeout=.1), server)
-		server.addHandler(sc)
-		for a_c in armservo_channel:
-			s = PositionServo(sc, a_c[1], a_c[0])
-			server.addHandler(s)
-	else:
-		logging.info('No servo controller specified')
-	if T1_PATH != '':
-		logging.info('Using \'%s\' as motor controller 1 device' % T1_PATH)
-		pc = PropController(serial.Serial(T1_PATH, timeout=.1))
-		for p_c in teensy1_prop_port:
-			p = Prop(pc, p_c[1], p_c[0])
-			server.addHandler(p)
-	else:
-		logging.info('No motor controller 1 specified')
-	asyncore.loop(timeout=2)
+
+	propulsion = Propulsion(Teensy('/dev/ttyACM0'))
+	
+	server = JsonServer('', port)
+	server.add_module('propulsion', propulsion)
+	
+	asyncore.loop(timeout=30)
 
