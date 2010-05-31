@@ -1,5 +1,34 @@
 from jsonserver import InvalidCommandError
 
+motor_port = {
+	'FL': 0,
+	'FR': 1,
+	'BL': 2,
+	'BR': 3,
+	'UL': 4,
+	'UR': 5,
+	'DL': 6,
+	'DR': 7
+	}
+
+class Motor(object):
+	def __init__(self, name, port, value=0):
+		self.name = name
+		self.port = port
+		self.value = value
+
+class MotorController(object):
+	def __init__(self, teensy, motor_port):
+		self.teensy = teensy	
+		self.motors = {}
+		for motor, port in motor_port.items():
+			self.motors[motor] = Motor(motor, port)
+	def set_motor(motor, value):
+		if value < 0 or value > 255:
+			raise ValueError('Out of range')
+		self.teensy.send_command('\x04', ord(value))
+		self.motors[motor].value = value
+
 class Propulsion(object):
 	def __init__(self, motor_controller):
 		self.motor_controller = motor_controller
@@ -59,4 +88,5 @@ class Propulsion(object):
 					self.move_direction_motors[direction],
 					magnitude
 					)
+		
 
