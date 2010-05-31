@@ -1,113 +1,54 @@
 #include "rovconnection.h"
 #include "varmonitor.h"
 
+#include <QByteArray>
+
 #include <QDebug>
 
 RovConnection::RovConnection(QString label,
 	QObject *parent)
 	: QTcpSocket(parent)
-	, m_label(label)
 {
 	connect(this, SIGNAL(readyRead()),
-		this, SLOT(dataRecieved()));
+		this, SLOT(dataReceived()));
 }
 
 RovConnection::~RovConnection()
 {
-	VarMonitor *m;
-	Q_FOREACH(m, monitor_list)
-		delete m;
 }
 
-bool RovConnection::setVar(const QString &name,
-	const QString &value)
+void RovConnection::sendCommand(const QString &module,
+	const QString &command,
+	QVariantMap &arguments)
 {
-	QString send;
-	if(state() == ConnectedState)
+	QVariantMap request;
+	request.insert("module", module);
+	request.insert("command", command);
+	request.insert("arguments", arguments);
+	QByteArray json = json_serializer.serialize(request);
+	write(json);
+}
+
+void RovConnection::dataReceived()
+{
+	bool ok;
+	QByteArray data = read(4096);
+
+	QVariant parsed = json_parser.parse(data, &ok);
+	QVariantMap response = parsed.toMap();
+	
+	if(!ok)
 	{
-		send = name;
-		send.append("=");
-		send.append(value);
-		send.append("\n");
-		write(send.toAscii());
-		return true;
-	}
-	else
-		qDebug() << "Cant set var on unconnected connection";
-	return false;
-}
-
-bool RovConnection::reqVar(const QString &name)
-{
-	qDebug() << "requesting value for " << name;
-	QString send;
-	send = name;
-	send.append("?\n");
-	write(send.toAscii());
-	return true;
-}
-
-void RovConnection::addMonitor(VarMonitor &monitor)
-{
-	monitors[monitor.name()].append(&monitor);
-	monitor_list.append(&monitor);
-}
-
-const QString &RovConnection::label() const
-{
-	return m_label;
-}
-
-void RovConnection::removeMonitor(VarMonitor &monitor)
-{
-	monitors[monitor.name()].removeAll(&monitor);
-	monitor_list.removeAll(&monitor);
-}
-
-void RovConnection::queryVarType(const QString &name)
-{
-	QString send;
-	send = name;
-	send.append(",\n");
-	write(send.toAscii());
-}
-
-void RovConnection::dataRecieved()
-{
-	QString line = readLine();
-	QString vr, va;
-
-	int eqindex = line.indexOf('=');
-	if(eqindex != -1)
-	{
-		vr = line.left(eqindex);
-		va = line.right(line.size() - eqindex - 1);
-		va.chop(1);
-		QList<VarMonitor*> ms = monitors[vr];
-		VarMonitor *m;
-		Q_FOREACH(m, ms)
-		{
-			m->gotValue(va);
-		}
-		qDebug() << "Got " << vr << va;
-		emit(var(vr, va));
+		qDebug() << "Invalid response, ditching it: ";
+		qDebug() << data;
 	}
 	else
 	{
-		eqindex = line.indexOf(',');
-		if(eqindex != -1)
-		{
-			vr = line.left(eqindex);
-			va = line.right(line.size() - eqindex - 1);
-			va.chop(1);
-			QList<VarMonitor*> ms = monitors[vr];
-			VarMonitor *m;
-			Q_FOREACH(m, ms)
-			{
-				m->gotValue(va);
-			}
-			emit(queryTypeResponse(vr, va));
-		}
+		QVariantMap command = response["command"].toMap();
+		QString module = command["module"].toString();
+		QString command_name = command["command"].toString();
+		QVariantMap arguments = command["arguments"].toMap();
+		emit(receivedCommand(module, command_name, arguments));
 	}
 }
 

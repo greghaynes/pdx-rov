@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include <QHash>
 #include <QString>
+#include <QVariantMap>
+#include <qjson/parser.h>
+#include <qjson/serializer.h>
 
 class VarMonitor;
 
@@ -18,39 +20,21 @@ class RovConnection
 			QObject *parent = 0);
 		~RovConnection();
 
-		bool setVar(const QString &name,
-			const QString &value);
-
-		/**
-		 * @brief Ask the server to respond with var state
-		 *
-		 * This call asks the server to send var state, which
-		 * will trigger var signal.  This may or may not happen
-		 * depending on how nicely you ask.
-		 */
-		bool reqVar(const QString &name);
-
-		void addMonitor(VarMonitor &monitor);
-
-		const QString &label() const;
-
-		void removeMonitor(VarMonitor &monitor);
-
-		void queryVarType(const QString &name);
-
-	private Q_SLOTS:
-		void dataRecieved();
+		void sendCommand(const QString &module,
+			const QString &command,
+			QVariantMap &arguments);
 
 	Q_SIGNALS:
-		void var(const QString &name,
-			const QString &value);
-		void queryTypeResponse(const QString &name,
-			const QString &value);
+		void receivedCommand(const QString &module,
+			const QString &command,
+			QVariantMap &arguments);
+
+	private Q_SLOTS:
+		void dataReceived();
 
 	private:
-		QString m_label;
-		QHash<QString, QList<VarMonitor*> > monitors;
-		QList<VarMonitor*> monitor_list;
+		QJson::Parser json_parser;
+		QJson::Serializer json_serializer;
 
 };
 
