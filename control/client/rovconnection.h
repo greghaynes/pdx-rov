@@ -24,6 +24,8 @@ class RovConnection
 			const QString &command,
 			QVariantMap &arguments);
 
+		const QString &label() const;
+
 	Q_SIGNALS:
 		void receivedCommand(const QString &module,
 			const QString &command,
@@ -33,6 +35,8 @@ class RovConnection
 		void dataReceived();
 
 	private:
+		QString m_label;
+
 		QJson::Parser json_parser;
 		QJson::Serializer json_serializer;
 

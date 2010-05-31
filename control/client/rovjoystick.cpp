@@ -30,6 +30,6 @@ void RovJoystick::onEvent(int type,
 	else
 			var = "Unknown";
 	var.append(QString::number(number));
-	m_conn->setVar(var, QString::number(val));
+//	m_conn->setVar(var, QString::number(val));
 }
 

@@ -3,7 +3,7 @@
 
 #include <QDebug>
 
-#define UPDATE_INTERVAL 50
+#define UPDATE_INTERVAL 10
 #define MIN 384
 #define MAX 1120
 
@@ -13,11 +13,17 @@ ArmJoystick::ArmJoystick(const QString &path,
 	: RovJoystick(path, conn, parent)
 	, flush_timer(new QTimer(this))
 {
-	m_var_val["ArmGripper"] = 385;
+	elbow = 0;
+	wrist = 0;
+	shoulder = 0;
+	
+	elbow_dirty = false;
+	wrist_dirty = false;
+	shoulder_dirty = false;
+
 	connect(flush_timer, SIGNAL(timeout()),
 		this, SLOT(flushChanges()));
-	connect(&conn, SIGNAL(var(const QString&, const QString&)),
-		this, SLOT(gotVarValue(const QString&, const QString&)));
+
 	flush_timer->setInterval(UPDATE_INTERVAL);
 	flush_timer->setSingleShot(false);
 	flush_timer->start();
@@ -35,53 +41,64 @@ void ArmJoystick::onEvent(int type,
 	}
 }
 
-void ArmJoystick::gotVarValue(const QString &name,
-	const QString &value)
-{
-	m_var_val[name] = value.toInt();
-}
-
 void ArmJoystick::flushChanges()
 {
-	QString key;
-	short int newval;
-	Q_FOREACH(key, m_latest_var_val.keys())
+	if(gripper_dirty)
 	{
-		unsigned short mot_val = m_latest_var_val[key] / 700;
-		if(mot_val != 0)
-		{
-			newval = m_var_val[key] + mot_val;
-			if(newval < MIN)
-				newval = MIN;
-			else if(newval > MAX)
-				newval= MAX;
-			qDebug() << "Sending " << key << "=" << newval;
-			connection().setVar(key, QString::number(newval));
-		}
+		updateJoint("gripper", gripper);
+		gripper_dirty = false;
 	}
+	if(wrist_dirty)
+	{
+		updateJoint("wrist", wrist);
+		wrist_dirty = false;
+	}
+	if(elbow_dirty)
+	{
+		updateJoint("elbow", elbow);
+		elbow_dirty = false;
+	}
+	if(shoulder_dirty)
+	{
+		updateJoint("shoulder", shoulder);
+		shoulder_dirty = false;
+	}
+}
+
+void ArmJoystick::updateJoint(const QString &joint, int magnitude)
+{
+	QVariantMap args;
+	args.insert("joint", joint);
+	if(magnitude > 30000)
+		args.insert("magnitude", 100);
+	else if(magnitude < -30000)
+		args.insert("magnitude", -100);
+	else
+		args.insert("magnitude", magnitude / 512);
+	connection().sendCommand("arm", "move", args);
 }
 
 void ArmJoystick::onAxisEvent(unsigned char number,
 	short int value)
 {
-	QString var;
 	switch(number)
 	{
 		case 0:
-			var = "ArmElbow";
+			gripper = value;
+			gripper_dirty = true;
 			break;
 		case 1:
-			var = "ArmWrist";
+			wrist = value;
+			wrist_dirty = true;
 			break;
 		case 3:
-			var = "ArmShoulder";
+			shoulder = value;
+			shoulder_dirty = true;
 			break;
-
-	}
-
-	if(var != "")
-	{
-		m_latest_var_val[var] = value;
+		case 4:
+			gripper = value;
+			gripper_dirty = true;
+			break;
 	}
 }
 

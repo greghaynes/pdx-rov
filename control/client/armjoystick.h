@@ -24,18 +24,25 @@ class ArmJoystick
 			short int value);
 
 	private Q_SLOTS:
-		void gotVarValue(const QString &name,
-			const QString &value);
 		void flushChanges();
 
 	private:
 		void onAxisEvent(unsigned char number,
 			short int value);
+		void updateJoint(const QString &joint,
+			int magnitude);
 
-		QHash<QString, short int> m_var_val;
-		QHash<QString, short int> m_latest_var_val;
 		QTimer *flush_timer;
 
+		short int elbow;
+		short int wrist;
+		short int shoulder;
+		short int gripper;
+
+		bool elbow_dirty;
+		bool wrist_dirty;
+		bool shoulder_dirty;
+		bool gripper_dirty;
 };
 
 #endif

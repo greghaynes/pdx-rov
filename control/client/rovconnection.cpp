@@ -8,6 +8,7 @@
 RovConnection::RovConnection(QString label,
 	QObject *parent)
 	: QTcpSocket(parent)
+	, m_label(label)
 {
 	connect(this, SIGNAL(readyRead()),
 		this, SLOT(dataReceived()));
@@ -22,11 +23,19 @@ void RovConnection::sendCommand(const QString &module,
 	QVariantMap &arguments)
 {
 	QVariantMap request;
-	request.insert("module", module);
-	request.insert("command", command);
-	request.insert("arguments", arguments);
+	QVariantMap command_map;
+	command_map.insert("module", module);
+	command_map.insert("command", command);
+	command_map.insert("arguments", arguments);
+	request.insert("command", command_map);
 	QByteArray json = json_serializer.serialize(request);
 	write(json);
+	write("\n\n");
+}
+
+const QString &RovConnection::label() const
+{
+	return m_label;
 }
 
 void RovConnection::dataReceived()

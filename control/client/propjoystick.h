@@ -25,12 +25,13 @@ class PropJoystick
 		void timeout();
 
 	private:
-		short int abs(short int) const;
-		short int joyToPropVal(short int) const;
-		short int absmax(short int*) const;
+		short int axisToProp(short int);
 
-		short int vert_axis_vals[2];
-		short int lat_axis_vals[2];
+		short int forward_axis;
+		short int strafe_axis;
+		short int ascend_axis;
+		short int yaw_axis;
+		short int roll_axis;
 
 };
 
