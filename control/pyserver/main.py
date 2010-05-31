@@ -8,6 +8,7 @@ import logging
 import sys, getopt
 import time
 import servo
+import arm
 
 LOG_LEVEL = logging.DEBUG
 SC_PATH = ''
@@ -41,10 +42,12 @@ if __name__ == '__main__':
 			sys.exit(0)
 	setupLogging()
 
-	propulsion = Propulsion(Teensy('/dev/ttyACM0'))
+	#propulsion = Propulsion(Teensy('/dev/ttyACM0'))
+	arm = arm.Arm(Teensy('/dev/ttyACM0'))
 	
 	server = JsonServer('', port)
-	server.add_module('propulsion', propulsion)
+#	server.add_module('propulsion', propulsion)
+	server.add_module('arm', arm)
 	
 	while True:
 		asyncore.loop(timeout=.02, count=1)
