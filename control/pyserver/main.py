@@ -6,6 +6,8 @@ import socket
 import serial
 import logging
 import sys, getopt
+import time
+import servo
 
 LOG_LEVEL = logging.DEBUG
 SC_PATH = ''
@@ -44,5 +46,8 @@ if __name__ == '__main__':
 	server = JsonServer('', port)
 	server.add_module('propulsion', propulsion)
 	
-	asyncore.loop(timeout=30)
+	while True:
+		asyncore.loop(timeout=.02, count=1)
+		cur_time = time.time()
+		servo.servo_manager.update_servos(cur_time)
 

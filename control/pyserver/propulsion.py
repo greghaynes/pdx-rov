@@ -23,15 +23,18 @@ class MotorController(object):
 		self.motors = {}
 		for motor, port in motor_port.items():
 			self.motors[motor] = Motor(motor, port)
-	def set_motor(motor, value):
-		if value < 0 or value > 255:
+	def set_motor(self, motor, value):
+		if value < 0:
 			raise ValueError('Out of range')
-		self.teensy.send_command('\x04', ord(value))
-		self.motors[motor].value = value
+		elif value > 255:
+			value = 255
+		if self.motors[motor].value != value:
+			self.teensy.send_command('\x04', chr(self.motors[motor].port) + chr(value))
+			self.motors[motor].value = value
 
 class Propulsion(object):
-	def __init__(self, motor_controller):
-		self.motor_controller = motor_controller
+	def __init__(self, teensy):
+		self.motor_controller = MotorController(teensy, motor_port)
 		self.command_handlers = {
 			'move': self.move_command
 			}
@@ -59,17 +62,12 @@ class Propulsion(object):
 			}
 	def handle_command(self, request, command, arguments):
 		try:
-			self.command_handlers[command.command](request, command, arguments)
+			self.command_handlers[command](request, command, arguments)
 		except KeyError:
 			raise InvalidCommandError(command)
 	def accumulate_move_motors(self, motors, effected_motors, magnitude):
 		for motor in effected_motors:
 			motors[motor] += magnitude
-	def process_move_strafe(self, motors, magnitude):
-		if magnitude > 0:
-			effected_motors = ('FL', 'BL')
-		else:
-			effected_motors = ('FR', 'BR')
 	def move_command(self, request, command, arguments):
 		tmp_motors = {
 			'FL': 0, 'FR': 0,
@@ -83,10 +81,16 @@ class Propulsion(object):
 			except KeyError:
 				pass
 			else:
-				accumulate_move_motors(
+				if magnitude > 0:
+					effected_motors = self.move_direction_motors[direction][0]
+				else:
+					effected_motors = self.move_direction_motors[direction][1]
+					magnitude = -magnitude
+				self.accumulate_move_motors(
 					tmp_motors,
-					self.move_direction_motors[direction],
+					effected_motors,
 					magnitude
 					)
-		
+		for motor, mag in tmp_motors.items():
+			self.motor_controller.set_motor(motor, mag)
 

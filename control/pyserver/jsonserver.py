@@ -1,5 +1,6 @@
 import asyncore, socket
 import json
+import logging
 
 # Response Codes
 # 0 - Success
@@ -35,7 +36,7 @@ class InvalidArgumentError(RequestError):
 
 class JsonClient(asyncore.dispatcher):
 	def __init__(self, server, socket):
-		asyncore.dispatcher.__init__(socket)
+		asyncore.dispatcher.__init__(self, socket)
 		self.server = server
 		self.ibuffer = ''
 		self.obuffer = []
@@ -47,7 +48,7 @@ class JsonClient(asyncore.dispatcher):
 			self.close()
 		else:
 			self.ibuffer += buff
-			tmp_buff = self.buffer.split('\n\n')
+			tmp_buff = self.ibuffer.split('\n\n')
 			self.ibuffer = tmp_buff.pop()
 			for line in tmp_buff:
 				self.handle_request_data(line)
@@ -57,7 +58,7 @@ class JsonClient(asyncore.dispatcher):
 		request = json.loads(data)
 		self.handle_request(request)
 	def handle_request(self, request):
-		self.server.handle_command(self, request, request.command)
+		self.server.handle_command(self, request, request['command'])
 	def send_response(self, code, command):
 		resp_dict = {
 			'code': code,
@@ -74,22 +75,32 @@ class JsonServer(asyncore.dispatcher):
 		self.listen(1024)
 	def handle_accept(self):
 		conn = self.socket.accept()
-		self.clients.append(VarClient(self, conn[0]))
+		logging.debug("Accepted connection");
+		self.clients.append(JsonClient(self, conn[0]))
 	def handle_command(self, client, request, command):
 		try:
-			self.modules[command.module].handle_command(
-				request,
-				command.commmand,
-				command.arguments)
-		except (KeyError, InvalidModuleError):
-			client.send_response(1, error_command)
-		except InvalidCommandError:
-			client.send_response(2, error_command)
+			module = command['module']
+			command_name = command['command']
+			arguments = command['arguments']
+		except KeyError:
+			logging.error("Invalid request")
+		else:
+			try:
+				self.modules[module].handle_command(
+					request,
+					command_name,
+					arguments)
+			except (KeyError, InvalidModuleError):
+				logging.error("Invalid module \'%s\'" % command['module'])
+				client.send_response(1, error_command)
+			except InvalidCommandError:
+				logging.error("Invalid command")
+				client.send_response(2, error_command)
 	def add_module(self, module_name, module):
 		self.modules[module_name] = module
 	def writable(self):
 		return False
 	def handle_close(self):
-		print 'close'
+		logging.debug("Server closed")
 		self.close()
 

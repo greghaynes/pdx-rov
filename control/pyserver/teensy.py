@@ -4,8 +4,9 @@ import os
 import time
 
 import timer
+import logging
 
-class Teensy(asyncore.file_wrapper):
+class Teensy(asyncore.file_dispatcher):
 	def __init__(self, path):
 		self.device = serial.Serial(path, timeout=0)
 		self.ibuffer = ''
@@ -13,7 +14,7 @@ class Teensy(asyncore.file_wrapper):
 		self.command_handlers = {
 			'\x00': self.handle_ping
 			}
-		asyncore.file_wrapper.__init__(self, self.device.fd)
+		asyncore.file_dispatcher.__init__(self, self.device.fd)
 	def handle_write(self):
 		for data in self.obuffer:
 			self.send(data)
@@ -21,7 +22,6 @@ class Teensy(asyncore.file_wrapper):
 	def writable(self):
 		return len(self.obuffer) > 0
 	def handle_read(self):
-		print 'read'
 		buff = self.device.read(1024)
 		if len(buff) == 0:
 			self.close()
@@ -42,5 +42,5 @@ class Teensy(asyncore.file_wrapper):
 	def handle_cloe(self):
 		self.close()
 	def send_command(self, command, data):
-		self.obuffer.append(ord(command) + data + '\n')
+		self.obuffer.append(command + data + '\n')
 
