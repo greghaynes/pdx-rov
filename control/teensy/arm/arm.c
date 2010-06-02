@@ -20,9 +20,8 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <avr/interrupt.h>
 #include <stdint.h>
-#include <avr/delay.h>
+#include <util/delay.h>
 #include "usb_serial.h"
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
@@ -31,33 +30,14 @@ void send_str(const char *s);
 uint8_t recv_str(char *buf, uint8_t size);
 void parse_and_execute_command(const char *buf, uint8_t num);
 
-#define START_ADC ADCSRA |= (1 << ADSC)
-
-#define ADC_COMPLETE (ADCSRA & (1 << ADIF))
-
-ISR(ADC_vect)
-{
-	usb_serial_putchar(ADCL);
-	usb_serial_putchar(ADCH);
-	usb_serial_putchar('\n');
-	START_ADC;
-}
-
 void set_default_duty_cycles(void)
 {
-	/*
-	OCR0A = 0x00;
-	OCR0B = 0x00;
-
-	OCR2A = 0x00;
-	OCR2B = 0x00;
-
 	OCR1AH = 0x00;
-	OCR1AL = 0x44; // Register used by 8bit pwm
+	OCR1AL = 0x00; // Register used by 8bit pwm
 	OCR1BH = 0x00;
-	OCR1BL = 0x44; // Register used by 8bit pwm
+	OCR1BL = 0x00; // Register used by 8bit pwm
 	OCR1CH = 0x00;
-	OCR1CL = 0x44; // Covered by OCR0A
+	OCR1CL = 0x00; // Covered by OCR0A
 
 	OCR3AH = 0x00;
 	OCR3AL = 0x00; // Register used by 8bit pwm
@@ -65,78 +45,71 @@ void set_default_duty_cycles(void)
 	OCR3BL = 0x00; // Register used by 8bit pwm
 	OCR3CH = 0x00;
 	OCR3CL = 0x00; // Register used by 8bit pwm
-
-	*/
 }
 
 void setup_pwms(void)
 {
-	// Timer 0
+	// Timer 1
 	// Set ports to output
-	PORTB = 0;
 	DDRB = (1 << DDB5) | (1 << DDB6) | (1 << DDB7);
+	DDRC = (1 << DDC4) | (1 << DDC5) | (1 << DDC6);
 
-	TCCR1A=0x80;
+	OCR1A = 0;
+	OCR1B = 0;
+	OCR1C = 0;
+
+	TCCR1A= (1<<COM1A1) | (1 << COM1B1) | (1 << COM1C1);
 	TCCR1B=0x12;
 	TCNT1H=0x00;
 	TCNT1L=0x00;
 
+	OCR3A = 0;
+	OCR3B = 0;
+	OCR3C = 0;
+
+	TCCR3A= (1<<COM3A1) | (1 << COM3B1) | (1 << COM3C1);
+	TCCR3B=0x12;
+	TCNT3H=0x00;
+	TCNT3L=0x00;
+
 	// 50hz
 	ICR1=20000;
-
-	OCR1A=2000;
-}
-
-void setup_adc(void)
-{
-	ADMUX = (1 << REFS1) | (1 << REFS0);
-
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0) | (1 << ADIE);
-	ADCSRB = (1 << ADTS2) | (1 << ADTS1);
-
-	DIDR0 = ADC0D;
+	ICR3=20000;
 }
 
 /**
  * @breif Handle a set pwm command
  */
-void handle_set_pwm_command(uint8_t port, uint16_t val)
+void handle_set_pwm_command(uint8_t port, uint8_t vall, uint8_t valh)
 {
 	usb_serial_putchar('\x04');
 	usb_serial_putchar(port);
 	switch(port)
 	{
 		case 0:
-			OCR0A = val;
+			OCR1AH = valh;
+			OCR1AL = vall;
 			break;
 		case 1:
-			OCR0B = val;
+			OCR1BH = valh;
+			OCR1BL = vall;
 			break;
 		case 2:
-			OCR1A = val;
+			OCR1CH = valh;
+			OCR1CL = vall;
 			break;
 		case 3:
-			OCR1B = val;
+			OCR3AH = valh;
+			OCR3AL = vall;
 			break;
 		case 4:
-			OCR2A = val;
+			OCR3BH = valh;
+			OCR3BL = vall;
 			break;
 		case 5:
-			OCR2B = val;
+			OCR3CH = valh;
+			OCR3CL = vall;
 			break;
-		case 6:
-			OCR3A = val;
-			break;
-		case 7:
-			OCR3B = val;
-			break;
-		case 8:
-			OCR3C = val;
-			break;
-		default:
-			usb_serial_putchar('\x01');
-			usb_serial_putchar('\n');
-			return;
 	}
 	usb_serial_putchar('\x00');
 	usb_serial_putchar('\n');
@@ -145,7 +118,7 @@ void handle_set_pwm_command(uint8_t port, uint16_t val)
 void handle_version_command(void)
 {
 	usb_serial_putchar('\x00');
-	send_str(PSTR("Motor Controller 1.0\n"));
+	send_str(PSTR("Arm Controller 1.0\n"));
 }
 
 void handle_ping_command(const char *str, uint8_t len)
@@ -188,7 +161,7 @@ void handle_command(const char *str, uint8_t len)
 			handle_pwm_ports_command();
 			break;
 		case 4:
-			handle_set_pwm_command(str[1], str[2]);
+			handle_set_pwm_command(str[1], str[2], str[3]);
 			break;
 		default:
 			send_str(PSTR("INVALID_COMMAND_CODE"));
@@ -202,16 +175,11 @@ int main(void)
 
 	CPU_PRESCALE(0);
 	setup_pwms();
-	setup_adc();
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;
 	_delay_ms(1000);
 
-	START_ADC;
-	while(1);
-
-#if 0
 	while (1){
 		while (!(usb_serial_get_control() & USB_SERIAL_DTR)) /* wait */ ;
 		usb_serial_flush_input();
@@ -223,7 +191,7 @@ int main(void)
 		}
 		
 	}
-#endif
+
 }
 
 // Send a string to the USB serial port.  The string must be in
