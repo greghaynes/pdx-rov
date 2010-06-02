@@ -33,6 +33,8 @@ class PropJoystick
 		short int yaw_axis;
 		short int roll_axis;
 
+		bool motion_dirty;
+
 };
 
 #endif
