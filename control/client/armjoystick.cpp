@@ -84,20 +84,20 @@ void ArmJoystick::onAxisEvent(unsigned char number,
 	switch(number)
 	{
 		case 0:
-			gripper = value;
-			gripper_dirty = true;
-			break;
-		case 1:
 			wrist = value;
 			wrist_dirty = true;
+			break;
+		case 1:
+			elbow = value;
+			elbow_dirty = true;
+			break;
+		case 2:
+			gripper = value;
+			gripper_dirty = true;
 			break;
 		case 3:
 			shoulder = value;
 			shoulder_dirty = true;
-			break;
-		case 4:
-			gripper = value;
-			gripper_dirty = true;
 			break;
 	}
 }
