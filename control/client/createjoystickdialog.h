@@ -7,8 +7,6 @@ namespace Ui
 {
 	class CreateJoystickWidget;
 }
-
-class ConnectionManager;
 class RovConnection;
 
 class CreateJoystickDialog
@@ -21,14 +19,9 @@ class CreateJoystickDialog
 
 		QString path() const;
 		int type() const;
-		RovConnection &connection();
-
-	private Q_SLOTS:
-		void connectionAdded(RovConnection &conn);
 
 	private:
 		Ui::CreateJoystickWidget *ui;
-		ConnectionManager *m_conn_manager;
 
 };
 

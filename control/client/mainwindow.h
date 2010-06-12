@@ -7,7 +7,7 @@
 #include <QTableView>
 
 class JoysticksModel;
-class ConnectionManager;
+class RovConnection;
 
 class MainWindow
 	: public QMainWindow
@@ -17,9 +17,10 @@ class MainWindow
 	public:
 		MainWindow(QWidget *parent = 0);
 
+		bool waitForConnect();
+
 	private Q_SLOTS:
 		void addJoystick();
-		void addVarMonitor();
 
 	private:
 		void setupToolbars();
@@ -33,7 +34,7 @@ class MainWindow
 		QAction *quitAction;
 		QTableView *m_joysticksTable;
 		JoysticksModel *m_joysticksModel;
-		ConnectionManager *m_connManager;
+		RovConnection *m_connection;
 
 };
 

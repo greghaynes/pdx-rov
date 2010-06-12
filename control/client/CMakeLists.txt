@@ -22,6 +22,7 @@ set(client_SRCS
 	servowidget.cpp
 	rovjoystick.cpp
 	armjoystick.cpp
+	connectingdialog.cpp
 	propjoystick.cpp)
 
 set(ui_SRCS

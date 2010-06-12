@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 	
 	MainWindow *mainWindow = new MainWindow();
 	mainWindow->setVisible(true);
-	
-	return app.exec();
+	if(mainWindow->waitForConnect())
+		return app.exec();
 }
 

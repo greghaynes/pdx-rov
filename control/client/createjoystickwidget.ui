@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>425</width>
-    <height>131</height>
+    <height>107</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,46 +15,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Type:</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item>
       <widget class="QComboBox" name="typeComboBox"/>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Connection:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QComboBox" name="connectionComboBox"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addConnectionPushButton">
-         <property name="text">
-          <string>Add Connection</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="0">
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Device Path:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item>
       <widget class="QLineEdit" name="devicePathLineEdit"/>
      </item>
     </layout>

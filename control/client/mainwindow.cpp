@@ -1,14 +1,13 @@
 #include "mainwindow.h"
 #include "createjoystickdialog.h"
 #include "createvarmonitordialog.h"
-#include "qjoystick.h"
 #include "joysticksmodel.h"
-#include "connectionmanager.h"
 #include "servowidget.h"
 #include "rovconnection.h"
 #include "varmonitorbuilder.h"
 #include "armjoystick.h"
 #include "propjoystick.h"
+#include "connectingdialog.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
@@ -16,7 +15,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
-	, m_connManager(ConnectionManager::instance())
+	, m_connection(new RovConnection("rov", this))
 {
 	m_joysticksModel = new JoysticksModel(this);
 	m_joysticksTable = new QTableView(this);
@@ -36,10 +35,10 @@ void MainWindow::addJoystick()
 		switch(d->type())
 		{
 			case RovJoystick::Arm:
-				j = new ArmJoystick(d->path(), d->connection(), this);
+				j = new ArmJoystick(d->path(), *m_connection, this);
 				break;
 			case RovJoystick::Propulsion:
-				j = new PropJoystick(d->path(), d->connection(), this);
+				j = new PropJoystick(d->path(), *m_connection, this);
 		}
 		
 		if(j)
@@ -49,13 +48,10 @@ void MainWindow::addJoystick()
 	}
 }
 
-void MainWindow::addVarMonitor()
+bool MainWindow::waitForConnect()
 {
-	CreateVarMonitorDialog *d = new CreateVarMonitorDialog(*m_connManager, this);
-	if(d->exec())
-	{
-		VarMonitorBuilder::instance().createVarMonitor(d->connection(), d->name());
-	}
+	ConnectingDialog *cd = new ConnectingDialog(this);
+	return cd->waitForConnectionOn(*m_connection);;
 }
 
 void MainWindow::setupToolbars()
@@ -87,8 +83,6 @@ void MainWindow::setupActions()
 		this, SLOT(close()));
 
 	addConnectionAction = new QAction("Add &Connection", this);
-	connect(addConnectionAction, SIGNAL(triggered(bool)),
-		m_connManager, SLOT(createConnection()));
 	addJoystickAction = new QAction("Add &Joystick", this);
 	connect(addJoystickAction, SIGNAL(triggered(bool)),
 		this, SLOT(addJoystick()));
