@@ -15,7 +15,6 @@ set(client_SRCS
 	motorslider.cpp
 	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
-	connectionmanager.cpp
 	createvarmonitordialog.cpp
 	varmonitorcreationprogressdialog.cpp
 	varmonitor.cpp
