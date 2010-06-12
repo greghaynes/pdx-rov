@@ -1,5 +1,7 @@
 find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork REQUIRED)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
+
 INCLUDE(${QT_USE_FILE})
 
 find_package(QJSON  REQUIRED)
