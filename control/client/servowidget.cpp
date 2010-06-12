@@ -22,12 +22,10 @@ ServoWidget::ServoWidget(const QString &name,
 	posLabel = new QLabel(m_str_pos, this);
 	mainVLayout->addWidget(posLabel);
 	setLayout(mainVLayout);
-	m_conn->reqVar(var_name);
 }
 
 ServoWidget::~ServoWidget()
 {
-	m_conn->removeMonitor(*this);
 }
 
 int ServoWidget::max() const
