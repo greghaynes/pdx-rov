@@ -83,6 +83,7 @@ void PropJoystick::timeout()
 		args.insert("forward", axisToProp(forward_axis));
 		args.insert("strafe", axisToProp(strafe_axis));
 		args.insert("yaw", axisToProp(yaw_axis));
+		args.insert("roll", 0);
 		args.insert("ascend", axisToProp(ascend_axis));
 
 		connection().sendCommand("propulsion", "move", args);
