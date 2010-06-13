@@ -31,7 +31,7 @@ void PropJoystick::onEvent(int type,
 	unsigned int time,
 	short int value)
 {
-	short int *dir_value;
+	short int *dir_value = 0;
 
 	switch(type)
 	{
@@ -47,15 +47,32 @@ void PropJoystick::onEvent(int type,
 				case 2:
 					dir_value = &yaw_axis;
 					break;
-				case 3:
+			}
+			break;
+		case QJoystick::Button:
+			switch(number)
+			{
+				case 4:
+				case 5:
 					dir_value = &ascend_axis;
+					if(value)
+						value = -20000;
+					break;
+				case 6:
+				case 7:
+					dir_value = &ascend_axis;
+					if(value)
+						value = 20000;
 					break;
 			}
 			break;
 	}
-
-	*dir_value = value;
-	motion_dirty = true;
+	
+	if(dir_value)
+	{
+		*dir_value = value;
+		motion_dirty = true;
+	}
 }
 
 void PropJoystick::timeout()
