@@ -56,7 +56,7 @@ bool MainWindow::waitForConnect()
 	{
 		RovJoystick *j = new ArmJoystick("/dev/input/js0", *m_connection, this);
 		m_joysticksModel->addJoystick(*j);
-		j = new ArmJoystick("/dev/input/js1", *m_connection, this);
+		j = new PropJoystick("/dev/input/js1", *m_connection, this);
 		m_joysticksModel->addJoystick(*j);
 	}
 	return val;
