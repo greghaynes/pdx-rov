@@ -43,14 +43,8 @@ class Arm(object):
 			servo = self.joint_servo[joint_name]
 		except KeyError:
 			raise InvalidArgumentError('Bad Argument')
-		if magnitude > 0:
-			direction = INCREASE
-		elif magnitude == 0:
-			direction = STOP
-		else:
-			direction = DECREASE
 		logging.debug('Moving %s by %i' % (joint_name, magnitude))
 		if magnitude < 0:
 			magnitude = - magnitude
-		servo.move(direction, magnitude)
+		servo.move(magnitude)
 
