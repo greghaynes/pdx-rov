@@ -96,7 +96,7 @@ void ArmJoystick::updateJoint(const QString &joint, int magnitude)
 	else if(magnitude < -30000)
 		args.insert("magnitude", -100);
 	else
-		args.insert("magnitude", magnitude / 1024);
+		args.insert("magnitude", magnitude / 10000);
 	connection().sendCommand("arm", "move", args);
 }
 

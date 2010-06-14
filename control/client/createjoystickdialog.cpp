@@ -1,5 +1,4 @@
 #include "createjoystickdialog.h"
-#include "connectionmanager.h"
 #include "rovconnection.h"
 #include "rovjoystick.h"
 
@@ -8,27 +7,15 @@
 CreateJoystickDialog::CreateJoystickDialog(QWidget *parent)
 	: QDialog(parent)
 	, ui(new Ui::CreateJoystickWidget)
-	, m_conn_manager(ConnectionManager::instance())
 {
 	ui->setupUi(this);
 	connect(ui->okPushButton, SIGNAL(clicked(bool)),
 		this, SLOT(accept()));
 	connect(ui->cancelPushButton, SIGNAL(clicked(bool)),
 		this, SLOT(reject()));
-	connect(ui->addConnectionPushButton, SIGNAL(clicked(bool)),
-		m_conn_manager, SLOT(createConnection()));
-	connect(m_conn_manager, SIGNAL(connectionAdded(RovConnection&)),
-		this, SLOT(connectionAdded(RovConnection&)));
 
 	ui->typeComboBox->addItem("Arm");
 	ui->typeComboBox->addItem("Propulsion");
-
-	
-	RovConnection *conn;
-	Q_FOREACH(conn, m_conn_manager->connections())
-	{
-		connectionAdded(*conn);
-	}
 }
 
 QString CreateJoystickDialog::path() const
@@ -41,16 +28,6 @@ int CreateJoystickDialog::type() const
 	if(ui->typeComboBox->currentIndex() != 0)
 		return RovJoystick::Propulsion;
 	return RovJoystick::Arm;
-}
-
-RovConnection &CreateJoystickDialog::connection()
-{
-	return *m_conn_manager->connections()[ui->connectionComboBox->currentIndex()];
-}
-
-void CreateJoystickDialog::connectionAdded(RovConnection &conn)
-{
-	ui->connectionComboBox->addItem(conn.label());
 }
 
 #include "createjoystickdialog.moc"

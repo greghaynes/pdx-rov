@@ -57,13 +57,13 @@ void PropJoystick::onEvent(int type,
 				case 5:
 					dir_value = &ascend_axis;
 					if(value)
-						value = -20000;
+						value = -32000;
 					break;
 				case 6:
 				case 7:
 					dir_value = &ascend_axis;
 					if(value)
-						value = 20000;
+						value = 32000;
 					break;
 			}
 			break;
