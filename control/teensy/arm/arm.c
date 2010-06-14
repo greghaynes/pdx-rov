@@ -20,15 +20,50 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <avr/interrupt.h>
 #include <stdint.h>
 #include <util/delay.h>
 #include "usb_serial.h"
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 
+#define START_ADC ADCSRA |= (1 << ADSC);
+
+#define ADC_COMPLETE (ADCSRA & (1 << ADIF))
+
 void send_str(const char *s);
 uint8_t recv_str(char *buf, uint8_t size);
 void parse_and_execute_command(const char *buf, uint8_t num);
+
+uint8_t adcl_vals[8];
+uint8_t adch_vals[8];
+uint8_t cur_adc_mux;
+
+void set_adc_port(uint8_t port)
+{
+	ADMUX = (1 << REFS1) | (1 << REFS0);
+	ADMUX |= port;
+}
+
+void setup_adc(void)
+{
+	uint8_t i;
+
+	for(i = 0;i < 8;i++)
+	{
+		adcl_vals[i] = 0;
+		adch_vals[i] = 0;
+	}
+
+	cur_adc_mux = 3;
+
+	// Set ref voltage / MUX
+	ADMUX = (1 << REFS1) | (1 << REFS0) | (1 << MUX1) | (1 << MUX0);
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADCSRB = (1 << ADTS2) | (1 << ADTS1);
+
+	// Digital disable (do this to all pins with analog signal applied to them)
+}
 
 void set_default_duty_cycles(void)
 {
@@ -75,6 +110,11 @@ void setup_pwms(void)
 	// 50hz
 	ICR1=20000;
 	ICR3=20000;
+}
+
+void handle_query_pwm_command(uint8_t port)
+{
+	// TODO
 }
 
 /**
@@ -144,6 +184,25 @@ void handle_pwm_ports_command(void)
 	send_str(PSTR("\x01\x02\x03\x04\x05\x06\x07\x08\n"));
 }
 
+void handle_adc_ports_command(void)
+{
+	usb_serial_putchar("\x06\x03\n");
+}
+
+void handle_query_adc_command(uint8_t port)
+{
+	START_ADC;
+	while(!ADC_COMPLETE);
+	uint8_t ah, al;
+	ah = ADCL;
+	al = ADCH;
+	usb_serial_putchar('\x07');
+	usb_serial_putchar('\x03');
+	usb_serial_putchar(ah);
+	usb_serial_putchar(al);
+	usb_serial_putchar('\n');
+}
+
 void handle_command(const char *str, uint8_t len)
 {
 	if(len == 0)
@@ -163,6 +222,15 @@ void handle_command(const char *str, uint8_t len)
 		case 4:
 			handle_set_pwm_command(str[1], str[2], str[3]);
 			break;
+		case 5:
+			handle_query_pwm_command(str[1]);
+			break;
+		case 6:
+			handle_adc_ports_command();
+			break;
+		case 7:
+			handle_query_adc_command(str[1]);
+			break;
 		default:
 			send_str(PSTR("INVALID_COMMAND_CODE"));
 	}
@@ -175,6 +243,7 @@ int main(void)
 
 	CPU_PRESCALE(0);
 	setup_pwms();
+	setup_adc();
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;

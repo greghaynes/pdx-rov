@@ -38,11 +38,13 @@ class ArmJoystick
 		short int wrist;
 		short int shoulder;
 		short int gripper;
+		short int pauldron;
 
 		bool elbow_dirty;
 		bool wrist_dirty;
 		bool shoulder_dirty;
 		bool gripper_dirty;
+		bool pauldron_dirty;
 };
 
 #endif
