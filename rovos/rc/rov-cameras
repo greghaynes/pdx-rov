@@ -1,0 +1,12 @@
+#! /bin/sh
+
+MJPG_STREAMER_PATH="/home/rov/mjpg-streamer/mjpg-streamer/"
+MJPG_STREAMER_BIN="$MJPG_STREAMER_PATH/mjpeg_streamer"
+
+case "$1" in
+	start)
+		echo "Starting cameras"
+		$MJPG_STREAMER_BIN -i "$MJPG_STREAMER_PATH/input_uvc.so -f 24 -d /dev/video0" -o "output_http.so -p 8081" &
+		$MJPG_STREAMER_BIN -i "$MJPG_STREAMER_PATH/input_uvc.so -f 24 -d /dev/video1" -o "output_http.so -p 8082" &
+esac
+
