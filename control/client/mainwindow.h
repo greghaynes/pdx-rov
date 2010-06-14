@@ -7,20 +7,21 @@
 #include <QTableView>
 
 class JoysticksModel;
+class QJoystick;
 class RovConnection;
 
 class MainWindow
 	: public QMainWindow
 {
-	Q_OBJECT
 
 	public:
-		MainWindow(QWidget *parent = 0);
+		MainWindow(RovConnection &conn,
+			QWidget *parent = 0);
 
 		bool waitForConnect();
 
-	private Q_SLOTS:
-		void addJoystick();
+	public:
+		void addJoystick(QJoystick &joystick);
 
 	private:
 		void setupToolbars();

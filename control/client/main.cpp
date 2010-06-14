@@ -3,14 +3,21 @@
 
 #include <iostream>
 
+#include "connectingdialog.h"
+#include "propjoystick.h"
+#include "armjoystick.h"
+#include "rovconnection.h"
 #include "mainwindow.h"
+
+#define PROP_JOYSTICK "/dev/input/js0"
+#define ARM_JOYSTICK "/dev/input/js1"
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	QFileInfo propstick_info("/dev/input/js0");
-	QFileInfo armstick_info("/dev/input/js1");
+	QFileInfo propstick_info(PROP_JOYSTICK);
+	QFileInfo armstick_info(ARM_JOYSTICK);
 
 	if(!propstick_info.exists())
 	{
@@ -23,10 +30,26 @@ int main(int argc, char **argv)
 		std::cout << "No arm joystick found.\n";
 		return 1;
 	}
-	
-	MainWindow *mainWindow = new MainWindow();
-	mainWindow->setVisible(true);
-	if(mainWindow->waitForConnect())
+
+	RovConnection connection;
+	ConnectingDialog cd;
+	if(cd.waitForConnectionOn(connection))
+	{
+		MainWindow *mainWindow = new MainWindow(connection);
+
+		PropJoystick pj(PROP_JOYSTICK, connection);
+		ArmJoystick aj(ARM_JOYSTICK, connection);
+
+		mainWindow->addJoystick(pj);
+		mainWindow->addJoystick(aj);
+		mainWindow->setVisible(true);
+
 		return app.exec();
+	}
+	else
+	{
+		std::cout << "Couldnt connect to ROV.\n";
+		return 1;
+	}
 }
 
