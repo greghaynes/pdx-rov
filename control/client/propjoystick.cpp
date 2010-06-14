@@ -46,6 +46,7 @@ void PropJoystick::onEvent(int type,
 					break;
 				case 2:
 					dir_value = &yaw_axis;
+					value = -value;
 					break;
 			}
 			break;
