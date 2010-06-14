@@ -35,16 +35,34 @@ void send_str(const char *s);
 uint8_t recv_str(char *buf, uint8_t size);
 void parse_and_execute_command(const char *buf, uint8_t num);
 
+uint8_t adcl_vals[8];
+uint8_t adch_vals[8];
+uint8_t cur_adc_mux;
+
+void set_adc_port(uint8_t port)
+{
+	ADMUX = (1 << REFS1) | (1 << REFS0);
+	ADMUX |= port;
+}
+
 void setup_adc(void)
 {
-	// Set ref voltage / MUX
-	ADMUX = (1 << REFS1) | (1 << REFS0);
+	uint8_t i;
 
+	for(i = 0;i < 8;i++)
+	{
+		adcl_vals[i] = 0;
+		adch_vals[i] = 0;
+	}
+
+	cur_adc_mux = 3;
+
+	// Set ref voltage / MUX
+	ADMUX = (1 << REFS1) | (1 << REFS0) | (1 << MUX1) | (1 << MUX0);
 	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 	ADCSRB = (1 << ADTS2) | (1 << ADTS1);
 
 	// Digital disable (do this to all pins with analog signal applied to them)
-	DIDR0 = ADC0D;
 }
 
 void set_default_duty_cycles(void)
@@ -168,12 +186,21 @@ void handle_pwm_ports_command(void)
 
 void handle_adc_ports_command(void)
 {
-	// TODO
+	usb_serial_putchar("\x06\x03\n");
 }
 
 void handle_query_adc_command(uint8_t port)
 {
-	// TODO
+	START_ADC;
+	while(!ADC_COMPLETE);
+	uint8_t ah, al;
+	ah = ADCL;
+	al = ADCH;
+	usb_serial_putchar('\x07');
+	usb_serial_putchar('\x03');
+	usb_serial_putchar(ah);
+	usb_serial_putchar(al);
+	usb_serial_putchar('\n');
 }
 
 void handle_command(const char *str, uint8_t len)
@@ -216,6 +243,7 @@ int main(void)
 
 	CPU_PRESCALE(0);
 	setup_pwms();
+	setup_adc();
 
 	usb_init();
 	while (!usb_configured()) /* wait */ ;
