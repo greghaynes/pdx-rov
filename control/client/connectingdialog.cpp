@@ -17,8 +17,7 @@ bool ConnectingDialog::waitForConnectionOn(QTcpSocket &connection)
 	setValue(0);
 	setLabel(new QLabel("Connecting to ROV..."));
 	connection.connectToHost("rov", 8080);
-	exec();
-	return true;
+	return exec();
 }
 
 void ConnectingDialog::connected()

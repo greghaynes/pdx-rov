@@ -51,7 +51,15 @@ void MainWindow::addJoystick()
 bool MainWindow::waitForConnect()
 {
 	ConnectingDialog *cd = new ConnectingDialog(this);
-	return cd->waitForConnectionOn(*m_connection);;
+	bool val = cd->waitForConnectionOn(*m_connection);
+	if(val)
+	{
+		RovJoystick *j = new ArmJoystick("/dev/input/js0", *m_connection, this);
+		m_joysticksModel->addJoystick(*j);
+		j = new ArmJoystick("/dev/input/js1", *m_connection, this);
+		m_joysticksModel->addJoystick(*j);
+	}
+	return val;
 }
 
 void MainWindow::setupToolbars()

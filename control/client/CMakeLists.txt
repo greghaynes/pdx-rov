@@ -13,12 +13,7 @@ set(client_SRCS
 	joysticksmodel.cpp
 	mainwindow.cpp
 	motorslider.cpp
-	varmonitorbuilder.cpp
 	createjoystickdialog.cpp
-	createvarmonitordialog.cpp
-	varmonitorcreationprogressdialog.cpp
-	varmonitor.cpp
-	servowidget.cpp
 	rovjoystick.cpp
 	armjoystick.cpp
 	connectingdialog.cpp
