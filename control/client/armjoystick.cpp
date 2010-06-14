@@ -16,10 +16,14 @@ ArmJoystick::ArmJoystick(const QString &path,
 	elbow = 0;
 	wrist = 0;
 	shoulder = 0;
+	gripper = 0;
+	pauldron = 0;
 	
 	elbow_dirty = false;
 	wrist_dirty = false;
 	shoulder_dirty = false;
+	gripper_dirty = false;
+	pauldron_dirty = false;
 
 	connect(flush_timer, SIGNAL(timeout()),
 		this, SLOT(flushChanges()));
@@ -38,6 +42,19 @@ void ArmJoystick::onEvent(int type,
 	{
 		case QJoystick::Axis:
 			onAxisEvent(number, value);
+			break;
+		case QJoystick::Button:
+			switch(number)
+			{
+				case 4:
+					gripper = 30000;
+					gripper_dirty = true;
+					break;
+				case 5:
+					gripper = -30000;
+					gripper_dirty = true;
+					break;
+			}
 	}
 }
 
@@ -63,6 +80,11 @@ void ArmJoystick::flushChanges()
 		updateJoint("shoulder", shoulder);
 		shoulder_dirty = false;
 	}
+	if(pauldron_dirty)
+	{
+		updateJoint("pauldron", pauldron);
+		pauldron_dirty = false;
+	}
 }
 
 void ArmJoystick::updateJoint(const QString &joint, int magnitude)
@@ -74,7 +96,7 @@ void ArmJoystick::updateJoint(const QString &joint, int magnitude)
 	else if(magnitude < -30000)
 		args.insert("magnitude", -100);
 	else
-		args.insert("magnitude", magnitude / 512);
+		args.insert("magnitude", magnitude / 1024);
 	connection().sendCommand("arm", "move", args);
 }
 
@@ -92,8 +114,8 @@ void ArmJoystick::onAxisEvent(unsigned char number,
 			elbow_dirty = true;
 			break;
 		case 2:
-			gripper = value;
-			gripper_dirty = true;
+			pauldron = value;
+			pauldron_dirty = true;
 			break;
 		case 3:
 			shoulder = value;
