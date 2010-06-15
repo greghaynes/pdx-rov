@@ -4,24 +4,29 @@ import logging
 
 arm_servos = {
 	'gripper': (
-		0, # teensy port
+		2, # teensy port
 		HS548Servo, # Servo model
 		800 #default value
 		),
 	'wrist': (
 		1,
 		AnalogServo,
-		800
+		2223
 		),
 	'elbow': (
-		2,
+		5,
 		HS548Servo,
-		800
+		835
 		),
 	'shoulder': (
 		3,
 		HS564Servo,
-		800
+		826
+		),
+	'pauldron': (
+		4,
+		HS564Servo,
+		1549
 		)
 	}
 
@@ -33,7 +38,7 @@ class Arm(object):
 				servo_desc[2],
 				servo_desc[0],
 				teensy)
-	def handle_command(self, request, command, arguments):
+	def handle_command(self, client, request, command, arguments):
 		try:
 			joint_name = arguments['joint']
 			magnitude = arguments['magnitude']
@@ -44,7 +49,5 @@ class Arm(object):
 		except KeyError:
 			raise InvalidArgumentError('Bad Argument')
 		logging.debug('Moving %s by %i' % (joint_name, magnitude))
-		if magnitude < 0:
-			magnitude = - magnitude
 		servo.move(magnitude)
 
