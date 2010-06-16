@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <errno.h>
+#include <string.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -18,6 +19,16 @@ struct buffer
 
 static int device_fd = 0;
 struct buffer device_buffer;
+
+static int xioctl(int fd, int request, void *arg)
+{
+	int r;
+
+	do r = ioctl(fd, request, arg);
+	while(-1 == r && EINTR == errno);
+
+	return r;
+}
 
 void usage()
 {
@@ -133,13 +144,30 @@ int init_device()
 		fmt.fmt.pix.sizeimage = min;
 
 	// Initialize buffer
-	device_buffer.length = buffer_size;
-	device_buffer.start = malloc(buffer_size);
+	device_buffer.length = fmt.fmt.pix.sizeimage;
+	device_buffer.start = malloc(fmt.fmt.pix.sizeimage);
 
 	if(!device_buffer.start)
 	{
 		fprintf(stderr, "Out of memory!\n");
 		return 0;
+	}
+
+	return 1;
+}
+
+int read_frame(void)
+{
+	struct v4l2_buffer buf;
+	unsigned int i;
+
+	if(-1 == read(device_fd, device_buffer.start, device_buffer.length))
+	{
+		if(errno != EAGAIN)
+		{
+			perror("Reading frame");
+			return 0;
+		}
 	}
 
 	return 1;
@@ -184,7 +212,39 @@ int main(int argc, char **argv)
 		|| !init_device())
 		exit(EXIT_FAILURE);
 
-	
+	while(1)
+	{
+		fd_set fds;
+		struct timeval tv;
+		int r;
+
+		FD_ZERO (&fds);
+		FD_SET (device_fd, &fds);
+
+		/* Timeout. */
+		tv.tv_sec = 2;
+		tv.tv_usec = 0;
+
+		r = select (device_fd + 1, &fds, NULL, NULL, &tv);
+
+		if (-1 == r) {
+			if (EINTR == errno)
+				continue;
+
+			perror("select");
+			exit(EXIT_FAILURE);
+		}
+
+		if (0 == r) {
+			fprintf (stderr, "select timeout\n");
+			exit (EXIT_FAILURE);
+		}
+
+		if(!read_frame())
+			break;
+		else
+			printf(".");
+	}
 
 	return 0;
 }
