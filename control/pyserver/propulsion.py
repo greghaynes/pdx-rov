@@ -41,16 +41,16 @@ class Propulsion(object):
 			}
 		self.move_direction_motors = {
 			'forward': (
-				(('FL', 1), ('FR', 1.25)),
-				(('BL', 1), ('BR', 1))
+				(('FL', .65), ('FR', 1)),
+				(('BL', .65), ('BR', 1))
 				),
 			'strafe': (
-				(('FL', 1), ('BL', 1)),
-				(('FR', 1), ('BR', 1))
+				(('FL', 1), ('BL', .9)),
+				(('FR', 1), ('BR', .9))
 				),
 			'ascend': (
-				(('DL', 1), ('DR', 1)),
-				(('UL', 1), ('UR', 1))
+				(('DL', .9), ('DR', .9)),
+				(('UL', .8), ('UR', .8))
 				),
 			'yaw': (
 				(('FL', 1), ('BR', 1)),
@@ -70,7 +70,8 @@ class Propulsion(object):
 		for motor_factor in effected_motors:
 			motor = motor_factor[0]
 			factor = motor_factor[1]
-			motors[motor] += magnitude * factor
+			magnitude *= factor
+			motors[motor] += magnitude
 	def move_command(self, request, command, arguments):
 		tmp_motors = {
 			'FL': 0, 'FR': 0,
