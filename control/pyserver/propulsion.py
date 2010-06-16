@@ -37,13 +37,17 @@ class MotorController(object):
 		for motor in self.motors:
 			states[motor.name] = motor.value
 		return states
+	def reset(self):
+		for motor in self.motors:
+			self.set_motor(motor.name, 0)
 
 class Propulsion(object):
 	def __init__(self, teensy):
 		self.motor_controller = MotorController(teensy, motor_port)
 		self.command_handlers = {
 			'move': self.move_command,
-			'motor_states': self.get_motor_states
+			'motor_states': self.get_motor_states,
+			'reset': self.motor_controller.reset
 			}
 		self.move_direction_motors = {
 			'forward': (
