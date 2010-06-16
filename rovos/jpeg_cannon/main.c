@@ -1,13 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <errno.h>
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <linux/videodev2.h>
+
+struct buffer
+{
+	void *start;
+	size_t length;
+};
+
 static int device_fd = 0;
+struct buffer device_buffer;
 
 void usage()
 {
@@ -48,6 +58,93 @@ int open_device(const char *device_path)
 	return 1;
 }
 
+int init_device()
+{
+	struct v4l2_capability cap;
+	struct v4l2_cropcap cropcap;
+	struct v4l2_crop crop;
+	struct v4l2_format fmt;
+	unsigned int min;
+
+	if(-1 == xioctl(device_fd, VIDIOC_QUERYCAP, &cap))
+	{
+		if(errno == EINVAL)
+		{
+			fprintf(stderr, "Not a valid v4l2 device\n");
+			return 0;
+		}
+		else
+		{
+			perror("Detecting device capability");
+			return 0;
+		}
+	}
+
+	if(!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+	{
+		fprintf(stderr, "Not a valid video capture device.\n");
+		return 0;
+	}
+
+	if(!(cap.capabilities & V4L2_CAP_READWRITE))
+	{
+		fprintf(stderr, "Device does not support read i/o.\n");
+		return 0;
+	}
+
+	memset(&cropcap, 0, sizeof(struct v4l2_cropcap));
+	cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+	if(0 == xioctl(device_fd, VIDIOC_CROPCAP, &cropcap))
+	{
+		crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		crop.c = cropcap.defrect; // Set to default
+
+		if(-1 == xioctl(device_fd, VIDIOC_S_CROP, &crop))
+		{
+			// Errors ignored
+		}
+	}
+	else
+	{
+		// Errors ignored
+	}
+
+	// Set capture format
+	memset(&fmt, 0, sizeof(struct v4l2_format));
+	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        fmt.fmt.pix.width = 640; 
+        fmt.fmt.pix.height = 480;
+        fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+        fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+
+	if(-1 == xioctl(device_fd, VIDIOC_S_FMT, &fmt))
+	{
+		perror("Setting device format");
+		return 0;
+	}
+
+	// Buggy driver voodoo
+	min = fmt.fmt.pix.width * 2;
+	if(fmt.fmt.pix.bytesperline < min)
+		fmt.fmt.pix.bytesperline = min;
+	min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
+	if(fmt.fmt.pix.sizeimage < min)
+		fmt.fmt.pix.sizeimage = min;
+
+	// Initialize buffer
+	device_buffer.length = buffer_size;
+	device_buffer.start = malloc(buffer_size);
+
+	if(!device_buffer.start)
+	{
+		fprintf(stderr, "Out of memory!\n");
+		return 0;
+	}
+
+	return 1;
+}
+
 int main(int argc, char **argv)
 {
 	char *device_path = 0;
@@ -83,8 +180,11 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if(!open_device(device_path))
+	if(!open_device(device_path)
+		|| !init_device())
 		exit(EXIT_FAILURE);
+
+	
 
 	return 0;
 }
