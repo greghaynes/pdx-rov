@@ -32,12 +32,18 @@ class MotorController(object):
 		if self.motors[motor].value != value:
 			self.teensy.send_command('\x04', chr(self.motors[motor].port) + chr(value))
 			self.motors[motor].value = value
+	def motor_states(self):
+		states = {}
+		for motor in self.motors:
+			states[motor.name] = motor.value
+		return states
 
 class Propulsion(object):
 	def __init__(self, teensy):
 		self.motor_controller = MotorController(teensy, motor_port)
 		self.command_handlers = {
-			'move': self.move_command
+			'move': self.move_command,
+			'motor_states': self.get_motor_states
 			}
 		self.move_direction_motors = {
 			'forward': (
@@ -63,7 +69,7 @@ class Propulsion(object):
 			}
 	def handle_command(self, client, request, command, arguments):
 		try:
-			self.command_handlers[command](request, command, arguments)
+			self.command_handlers[command](client, request, command, arguments)
 		except KeyError:
 			raise InvalidCommandError(command)
 	def normalize_motors(self, motors):
@@ -84,7 +90,7 @@ class Propulsion(object):
 			factor = motor_factor[1]
 			magnitude *= factor
 			motors[motor] += magnitude
-	def move_command(self, request, command, arguments):
+	def move_command(self, client, request, command, arguments):
 		'''Every move command requires all motor values to be sent'''
 		tmp_motors = {
 			'FL': 0, 'FR': 0,
@@ -116,4 +122,10 @@ class Propulsion(object):
 		for motor, mag in tmp_motors.items():
 			'''Send the values to the controller'''
 			self.motor_controller.set_motor(motor, mag)
+	def get_motor_states(self, client, request, command, arguments):
+		client.send_response(0, {
+			'module': 'propulsion',
+			'command': 'motor_states',
+			'arguments': { 'motors': self.motor_controller.motor_states() },
+			}
 
