@@ -1,10 +1,10 @@
 from jsonserver import InvalidCommandError
 
 motor_port = {
-	'FL': 0,
-	'FR': 3,
-	'BL': 2,
-	'BR': 1,
+	'FL': 2,
+	'FR': 1,
+	'BL': 0,
+	'BR': 3,
 	'UL': 4,
 	'UR': 5,
 	'DL': 6,
@@ -24,6 +24,7 @@ class MotorController(object):
 		for motor, port in motor_port.items():
 			self.motors[motor] = Motor(motor, port)
 	def set_motor(self, motor, value):
+		value = int(value)
 		if value < 0:
 			raise ValueError('Out of range')
 		elif value > 255:
@@ -40,24 +41,24 @@ class Propulsion(object):
 			}
 		self.move_direction_motors = {
 			'forward': (
-				('FL', 'FR'),
-				('BL', 'BR')
+				(('FL', 1), ('FR', 1.25)),
+				(('BL', 1), ('BR', 1))
 				),
 			'strafe': (
-				('FL', 'BL'),
-				('FR', 'BR')
+				(('FL', 1), ('BL', 1)),
+				(('FR', 1), ('BR', 1))
 				),
 			'ascend': (
-				('DL', 'DR'),
-				('UL', 'UR')
+				(('DL', 1), ('DR', 1)),
+				(('UL', 1), ('UR', 1))
 				),
 			'yaw': (
-				('FL', 'BR'),
-				('FR', 'BL')
+				(('FL', 1), ('BR', 1)),
+				(('FR', 1), ('BL', 1))
 				),
 			'roll': (
-				('UL', 'DR'),
-				('UR', 'DL')
+				(('UL', 1), ('DR', 1)),
+				(('UR', 1), ('DL', 1))
 				)
 			}
 	def handle_command(self, client, request, command, arguments):
@@ -66,8 +67,10 @@ class Propulsion(object):
 		except KeyError:
 			raise InvalidCommandError(command)
 	def accumulate_move_motors(self, motors, effected_motors, magnitude):
-		for motor in effected_motors:
-			motors[motor] += magnitude
+		for motor_factor in effected_motors:
+			motor = motor_factor[0]
+			factor = motor_factor[1]
+			motors[motor] += magnitude * factor
 	def move_command(self, request, command, arguments):
 		tmp_motors = {
 			'FL': 0, 'FR': 0,
