@@ -2,9 +2,9 @@ from jsonserver import InvalidCommandError
 
 motor_port = {
 	'FL': 0,
-	'FR': 1,
+	'FR': 3,
 	'BL': 2,
-	'BR': 3,
+	'BR': 1,
 	'UL': 4,
 	'UR': 5,
 	'DL': 6,
@@ -60,7 +60,7 @@ class Propulsion(object):
 				('UR', 'DL')
 				)
 			}
-	def handle_command(self, request, command, arguments):
+	def handle_command(self, client, request, command, arguments):
 		try:
 			self.command_handlers[command](request, command, arguments)
 		except KeyError:
