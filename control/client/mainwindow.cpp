@@ -1,10 +1,7 @@
 #include "mainwindow.h"
 #include "createjoystickdialog.h"
-#include "createvarmonitordialog.h"
 #include "joysticksmodel.h"
-#include "servowidget.h"
 #include "rovconnection.h"
-#include "varmonitorbuilder.h"
 
 #include <QVBoxLayout>
 #include <QMenu>
@@ -16,25 +13,19 @@ MainWindow::MainWindow(RovConnection &conn,
 	, m_connection(&conn)
 {
 	m_joysticksModel = new JoysticksModel(this);
-	m_joysticksTable = new QTableView(this);
-	m_joysticksTable->setModel(m_joysticksModel);
-	setCentralWidget(m_joysticksTable);
 	setupActions();
 	setupMenus();
 	setupToolbars();
 }
 
-void MainWindow::addJoystick(QJoystick &joystick)
+JoysticksModel &MainWindow::joysticksModel()
 {
-	m_joysticksModel->addJoystick(joystick);
+	return *m_joysticksModel;
 }
 
 void MainWindow::setupToolbars()
 {
 	m_toolBar = new QToolBar(this);
-	m_toolBar->addAction(addConnectionAction);
-	m_toolBar->addAction(addJoystickAction);
-	m_toolBar->addAction(addVarMonitorAction);
 
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
 }
@@ -42,10 +33,6 @@ void MainWindow::setupToolbars()
 void MainWindow::setupMenus()
 {
 	QMenu *fileMenu = new QMenu("&File", this);
-	fileMenu->addAction(addConnectionAction);
-	fileMenu->addAction(addJoystickAction);
-	fileMenu->addAction(addVarMonitorAction);
-	fileMenu->addAction(quitAction);
 	
 	menuBar()->addMenu(fileMenu);
 }
@@ -56,13 +43,5 @@ void MainWindow::setupActions()
 	quitAction->setShortcut(QKeySequence::Close);
 	connect(quitAction, SIGNAL(triggered(bool)),
 		this, SLOT(close()));
-
-	addConnectionAction = new QAction("Add &Connection", this);
-	addJoystickAction = new QAction("Add &Joystick", this);
-	connect(addJoystickAction, SIGNAL(triggered(bool)),
-		this, SLOT(addJoystick()));
-	addVarMonitorAction = new QAction("Add &Variable Monitor", this);
-	connect(addVarMonitorAction, SIGNAL(triggered(bool)),
-		this, SLOT(addVarMonitor()));
 }
 

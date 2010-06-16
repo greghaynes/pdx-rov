@@ -21,7 +21,6 @@ set(client_SRCS
 
 set(ui_SRCS
 	createjoystickwidget.ui
-	createvarmonitorwidget.ui
 	createconnectionwidget.ui)
 
 QT4_AUTOMOC(${client_SRCS})

@@ -8,6 +8,7 @@
 #include "armjoystick.h"
 #include "rovconnection.h"
 #include "mainwindow.h"
+#include "joysticksmodel.h"
 
 #define PROP_JOYSTICK "/dev/input/js0"
 #define ARM_JOYSTICK "/dev/input/js1"
@@ -40,8 +41,8 @@ int main(int argc, char **argv)
 		PropJoystick pj(PROP_JOYSTICK, connection);
 		ArmJoystick aj(ARM_JOYSTICK, connection);
 
-		mainWindow->addJoystick(pj);
-		mainWindow->addJoystick(aj);
+		mainWindow->joysticksModel().addJoystick(pj);
+		mainWindow->joysticksModel().addJoystick(aj);
 		mainWindow->setVisible(true);
 
 		return app.exec();

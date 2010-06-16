@@ -19,9 +19,7 @@ class MainWindow
 			QWidget *parent = 0);
 
 		bool waitForConnect();
-
-	public:
-		void addJoystick(QJoystick &joystick);
+		JoysticksModel &joysticksModel();
 
 	private:
 		void setupToolbars();
@@ -29,11 +27,7 @@ class MainWindow
 		void setupMenus();
 
 		QToolBar *m_toolBar;
-		QAction *addJoystickAction;
-		QAction *addVarMonitorAction;
-		QAction *addConnectionAction;
 		QAction *quitAction;
-		QTableView *m_joysticksTable;
 		JoysticksModel *m_joysticksModel;
 		RovConnection *m_connection;
 
