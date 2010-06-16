@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "createjoystickdialog.h"
 #include "joysticksmodel.h"
 #include "rovconnection.h"
 
