@@ -41,15 +41,15 @@ class Propulsion(object):
 			}
 		self.move_direction_motors = {
 			'forward': (
-				(('FL', .65), ('FR', 1)),
-				(('BL', .65), ('BR', 1))
+				(('FL', .75), ('FR', 1)),
+				(('BL', .75), ('BR', 1))
 				),
 			'strafe': (
 				(('FL', 1), ('BL', .9)),
 				(('FR', 1), ('BR', .9))
 				),
 			'ascend': (
-				(('DL', .9), ('DR', .9)),
+				(('DL', 1), ('DR', 1)),
 				(('UL', .8), ('UR', .8))
 				),
 			'yaw': (
@@ -66,6 +66,18 @@ class Propulsion(object):
 			self.command_handlers[command](request, command, arguments)
 		except KeyError:
 			raise InvalidCommandError(command)
+	def normalize_motors(self, motors):
+		'''If a motor value is over 255 scale all (linearly) so the max value is 255'''
+		maxval = 0
+		for motor, value in motors.items():
+			if maxval < value:
+				maxval = value
+		if maxval <= 255:
+			'''No normalization needed'''
+			return motors
+		normconst = float(255) / maxval:
+		for motor, value in motors.items():
+			motors[motor] = int(value * normconst)
 	def accumulate_move_motors(self, motors, effected_motors, magnitude):
 		for motor_factor in effected_motors:
 			motor = motor_factor[0]
@@ -73,13 +85,16 @@ class Propulsion(object):
 			magnitude *= factor
 			motors[motor] += magnitude
 	def move_command(self, request, command, arguments):
+		'''Every move command requires all motor values to be sent'''
 		tmp_motors = {
 			'FL': 0, 'FR': 0,
 			'BL': 0, 'BR': 0,
 			'UL': 0, 'UR': 0,
 			'DL': 0, 'DR': 0
 			}
+		
 		for direction in ('forward', 'strafe', 'ascend', 'yaw', 'roll'):
+			'''Accumulate values from each motion vector'''
 			try:
 				magnitude = arguments[direction]
 			except KeyError:
@@ -95,6 +110,10 @@ class Propulsion(object):
 					effected_motors,
 					magnitude
 					)
+
+		normalize_motors(tmp_motors)
+
 		for motor, mag in tmp_motors.items():
+			'''Send the values to the controller'''
 			self.motor_controller.set_motor(motor, mag)
 
