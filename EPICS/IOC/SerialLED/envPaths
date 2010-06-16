@@ -1,5 +1,0 @@
-epicsEnvSet("ARCH","linux-x86_64")
-epicsEnvSet("IOC","iocSerialLED")
-epicsEnvSet("TOP","/home/greghaynes/Projects/pdx-rov/EPICS/IOC/SerialLED")
-epicsEnvSet("ASYN","/home/greghaynes/asyn-4.12")
-epicsEnvSet("EPICS_BASE","/home/greghaynes/base-3-14-11")

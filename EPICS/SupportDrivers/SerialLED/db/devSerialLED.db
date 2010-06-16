@@ -1,6 +1,0 @@
-record(longout, "$(P)$(R)LedOn")
-{
-    field(DESC, "Turn on LED")
-    field(DTYP, "SerialLED")
-    field(OUT,  "#L$(L) A$(A) @1")
-}
