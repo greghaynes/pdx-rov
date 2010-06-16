@@ -48,14 +48,14 @@ void ArmJoystick::onEvent(int type,
 			{
 				case 4:
 					if(value)
-						gripper = 30000;
+						gripper = 30001;
 					else
 						gripper = 0;
 					gripper_dirty = true;
 					break;
 				case 5:
 					if(value)
-						gripper = -30000;
+						gripper = -30001;
 					else
 						gripper = 0;
 					gripper_dirty = true;
