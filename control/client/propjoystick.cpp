@@ -47,21 +47,23 @@ void PropJoystick::onEvent(int type,
 					break;
 				case 2:
 					dir_value = &yaw_axis;
-					value = -value;
 					break;
+				case 3:
+					dir_value = &ascend_trim_axis; 
+					value = -value;
 			}
 			break;
 		case QJoystick::Button:
 			switch(number)
 			{
-				case 4:
-				case 5:
+				case 2:
+				case 3:
 					dir_value = &ascend_axis;
 					if(value)
 						value = -32000;
 					break;
-				case 6:
-				case 7:
+				case 4:
+				case 5:
 					dir_value = &ascend_axis;
 					if(value)
 						value = 32000;
@@ -86,7 +88,7 @@ void PropJoystick::timeout()
 		args.insert("strafe", axisToProp(strafe_axis));
 		args.insert("yaw", axisToProp(yaw_axis));
 		args.insert("roll", 0);
-		args.insert("ascend", axisToProp(ascend_axis));
+		args.insert("ascend", axisToProp(ascend_axis) + axisToProp(ascend_trim_axis));
 
 		connection().sendCommand("propulsion", "move", args);
 		motion_dirty = false;
