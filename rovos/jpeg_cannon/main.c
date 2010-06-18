@@ -1,3 +1,5 @@
+#include "network.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -10,10 +12,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
+#include <sys/time.h>
+#include <signal.h>
 
 #include <linux/videodev2.h>
 
@@ -23,15 +23,26 @@ struct buffer
 	size_t length;
 };
 
+time_t cur_time_sec;
+
 // Camera capture globals
 static int device_fd = 0;
 struct buffer *buffers;
 static char *device_path = 0;
 static int n_buffers = 0;
 
-// Network globals
-static int sock_fd = 0;
-struct sockaddr_in si_src, si_dest;
+/* gettimeofday cheat */
+static void handle_sigalrm(int code)
+{
+	struct timeval tv;
+
+	if(-1 == gettimeofday(&tv, 0))
+		perror("gettimeofday");
+	else
+		cur_time_sec = tv.tv_sec;
+
+	alarm(1);
+}
 
 static int xioctl(int fd, int request, void *arg)
 {
@@ -45,7 +56,7 @@ static int xioctl(int fd, int request, void *arg)
 
 void usage()
 {
-	printf("Usage: ./jpeg_cannon -d device\n");
+	printf("Usage: ./jpeg_cannon -d device -s server_port\n");
 }
 
 void help()
@@ -54,11 +65,12 @@ void help()
 	usage();
 }
 
-static const char short_options [] = "d:h";
+static const char short_options [] = "ds:h";
 
 static const struct option long_options [] = {
 	{ "device", required_argument, NULL, 'd' },
 	{ "help", no_argument, NULL, 'h' },
+	{ "sport", required_argument, NULL, 's' },
 	{ 0, 0, 0, 0, }
 	};
 
@@ -308,6 +320,11 @@ int start_capture()
 
 int main(int argc, char **argv)
 {
+	short int sport;
+
+	signal(SIGALRM, handle_sigalrm);
+	handle_sigalrm(SIGALRM);
+
 	// Argument Processing
 	while(1)
 	{
@@ -326,6 +343,9 @@ int main(int argc, char **argv)
 				break;
 			case 'd':
 				device_path = optarg;
+				break;
+			case 's':
+				sport = atoi(optarg);
 				break;
 			case 'h':
 				help();
@@ -348,7 +368,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 
 	// Init network
-	if(!init_net())
+	if(!network_init(sport))
 		exit(EXIT_FAILURE);
 
 	while(1)
@@ -358,14 +378,14 @@ int main(int argc, char **argv)
 		int r;
 
 		FD_ZERO(&r_fds);
-		FD_ZER0(&w_fds);
-		FD_SET(device_fd, &fds);
+		FD_ZERO(&w_fds);
+		FD_SET(device_fd, &r_fds);
 
 		/* Timeout. */
 		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
-		r = select (device_fd + 1, &fds, NULL, NULL, &tv);
+		r = select (device_fd + 1, &r_fds, NULL, NULL, &tv);
 
 		if (-1 == r) {
 			if (EINTR == errno)
