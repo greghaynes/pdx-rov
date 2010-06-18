@@ -3,11 +3,17 @@
 #include <getopt.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/mman.h>
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 #include <linux/videodev2.h>
 
@@ -17,8 +23,15 @@ struct buffer
 	size_t length;
 };
 
+// Camera capture globals
 static int device_fd = 0;
-struct buffer device_buffer;
+struct buffer *buffers;
+static char *device_path = 0;
+static int n_buffers = 0;
+
+// Network globals
+static int sock_fd = 0;
+struct sockaddr_in si_src, si_dest;
 
 static int xioctl(int fd, int request, void *arg)
 {
@@ -69,6 +82,82 @@ int open_device(const char *device_path)
 	return 1;
 }
 
+static void process_image (const void *p)
+{
+        fputc ('.', stdout);
+        fflush (stdout);
+}
+
+int init_mmap()
+{
+	struct v4l2_requestbuffers req;
+
+	memset(&req, 0, sizeof(struct v4l2_requestbuffers));
+        req.count = 4;
+        req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        req.memory = V4L2_MEMORY_MMAP;
+
+	if(-1 == xioctl(device_fd, VIDIOC_REQBUFS, &req))
+	{
+		if(EINVAL == errno)
+		{
+			fprintf(stderr, "%s does not support "
+				 "memory mapping\n", device_path);
+			return 0;
+		}
+		else
+		{
+			perror("reqbuffs");
+			return 0;
+		}
+	}
+
+	if(req.count < 2)
+	{
+		fprintf(stderr, "Insufficient buffer memory on %s\n",
+			device_path);
+		return 0;
+	}
+
+	buffers = calloc(req.count, sizeof(*buffers));
+	
+	if(!buffers)
+	{
+		fprintf(stderr, "Out of memory\n");
+		return 0;
+	}
+
+	for (n_buffers = 0; n_buffers < req.count; ++n_buffers) {
+		struct v4l2_buffer buf;
+
+		memset(&buf, 0, sizeof(struct v4l2_buffer));
+
+		buf.type        = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		buf.memory      = V4L2_MEMORY_MMAP;
+		buf.index       = n_buffers;
+
+		if (-1 == xioctl (device_fd, VIDIOC_QUERYBUF, &buf))
+		{
+			perror("VIDIOC_QUERYBUF");
+			return 0;
+		}
+
+		buffers[n_buffers].length = buf.length;
+		buffers[n_buffers].start =
+			mmap (NULL /* start anywhere */,
+			      buf.length,
+			      PROT_READ | PROT_WRITE /* required */,
+			      MAP_SHARED /* recommended */,
+			      device_fd, buf.m.offset);
+
+		if (MAP_FAILED == buffers[n_buffers].start)
+		{
+			perror("mmap");
+			return 0;
+		}
+	}
+}
+
 int init_device()
 {
 	struct v4l2_capability cap;
@@ -97,9 +186,9 @@ int init_device()
 		return 0;
 	}
 
-	if(!(cap.capabilities & V4L2_CAP_READWRITE))
+	if(!(cap.capabilities & V4L2_CAP_STREAMING))
 	{
-		fprintf(stderr, "Device does not support read i/o.\n");
+		fprintf(stderr, "Device does not support streaming i/o.\n");
 		return 0;
 	}
 
@@ -143,17 +232,7 @@ int init_device()
 	if(fmt.fmt.pix.sizeimage < min)
 		fmt.fmt.pix.sizeimage = min;
 
-	// Initialize buffer
-	device_buffer.length = fmt.fmt.pix.sizeimage;
-	device_buffer.start = malloc(fmt.fmt.pix.sizeimage);
-
-	if(!device_buffer.start)
-	{
-		fprintf(stderr, "Out of memory!\n");
-		return 0;
-	}
-
-	return 1;
+	return init_mmap();
 }
 
 int read_frame(void)
@@ -161,13 +240,67 @@ int read_frame(void)
 	struct v4l2_buffer buf;
 	unsigned int i;
 
-	if(-1 == read(device_fd, device_buffer.start, device_buffer.length))
-	{
-		if(errno != EAGAIN)
-		{
-			perror("Reading frame");
+	memset(&buf, 0, sizeof(struct v4l2_buffer));
+
+	buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	buf.memory = V4L2_MEMORY_MMAP;
+
+	if (-1 == xioctl (device_fd, VIDIOC_DQBUF, &buf)) {
+		switch (errno) {
+		case EAGAIN:
+			return 1;
+
+		case EIO:
+			/* Could ignore EIO, see spec. */
+
+			/* fall through */
+
+		default:
+			perror("Query read buff");
 			return 0;
 		}
+	}
+
+	assert(buf.index < n_buffers);
+
+	process_image (buffers[buf.index].start);
+
+	if (-1 == xioctl (device_fd, VIDIOC_QBUF, &buf))
+	{
+		perror("VIDIOC_QBUF");
+		return 0;
+	}
+
+	return 1;
+}
+
+int start_capture()
+{
+	unsigned int i;
+	enum v4l2_buf_type type;
+
+	for (i = 0; i < n_buffers; ++i) {
+		struct v4l2_buffer buf;
+
+		memset(&buf, 0, sizeof(struct v4l2_buffer));
+
+		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		buf.memory = V4L2_MEMORY_MMAP;
+		buf.index = i;
+
+		if(-1 == xioctl(device_fd, VIDIOC_QBUF, &buf))
+		{
+			perror("VIDIOC_QBUF");
+			return 0;
+		}
+	}
+	
+	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+	if(-1 == xioctl(device_fd, VIDIOC_STREAMON, &type))
+	{
+		perror("VIDIOC_STREAMON");
+		return 0;
 	}
 
 	return 1;
@@ -175,8 +308,6 @@ int read_frame(void)
 
 int main(int argc, char **argv)
 {
-	char *device_path = 0;
-
 	// Argument Processing
 	while(1)
 	{
@@ -202,6 +333,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// Init video
 	if(!device_path)
 	{
 		usage();
@@ -212,14 +344,22 @@ int main(int argc, char **argv)
 		|| !init_device())
 		exit(EXIT_FAILURE);
 
+	if(!start_capture())
+		exit(EXIT_FAILURE);
+
+	// Init network
+	if(!init_net())
+		exit(EXIT_FAILURE);
+
 	while(1)
 	{
-		fd_set fds;
+		fd_set r_fds, w_fds;
 		struct timeval tv;
 		int r;
 
-		FD_ZERO (&fds);
-		FD_SET (device_fd, &fds);
+		FD_ZERO(&r_fds);
+		FD_ZER0(&w_fds);
+		FD_SET(device_fd, &fds);
 
 		/* Timeout. */
 		tv.tv_sec = 2;
@@ -242,8 +382,6 @@ int main(int argc, char **argv)
 
 		if(!read_frame())
 			break;
-		else
-			printf(".");
 	}
 
 	return 0;
