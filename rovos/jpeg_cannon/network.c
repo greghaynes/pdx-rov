@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -99,6 +100,8 @@ void network_handle_read()
 void network_broadcast(const char *data, int len)
 {
 	struct client *itr = clients;
+
+	printf("Broadcasting msg size: %i\n", len);
 
 	while(itr)
 	{
