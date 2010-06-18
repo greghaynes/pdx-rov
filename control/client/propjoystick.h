@@ -32,6 +32,7 @@ class PropJoystick
 		short int ascend_axis;
 		short int yaw_axis;
 		short int roll_axis;
+		short int ascend_trim_axis;
 
 		bool motion_dirty;
 
