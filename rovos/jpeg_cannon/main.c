@@ -17,6 +17,8 @@
 
 #include <linux/videodev2.h>
 
+extern int sock_fd;
+
 struct buffer
 {
 	void *start;
@@ -96,8 +98,7 @@ int open_device(const char *device_path)
 
 static void process_image (const void *p)
 {
-        fputc ('.', stdout);
-        fflush (stdout);
+	network_broadcast(p, strlen(p));
 }
 
 int init_mmap()
@@ -380,6 +381,7 @@ int main(int argc, char **argv)
 		FD_ZERO(&r_fds);
 		FD_ZERO(&w_fds);
 		FD_SET(device_fd, &r_fds);
+		FD_SET(sock_fd, &r_fds);
 
 		/* Timeout. */
 		tv.tv_sec = 2;
@@ -400,8 +402,15 @@ int main(int argc, char **argv)
 			exit (EXIT_FAILURE);
 		}
 
-		if(!read_frame())
-			break;
+		if(FD_ISSET(sock_fd, &r_fds))
+			network_handle_read();
+
+		if(FD_ISSET(device_fd, &r_fds))
+		{
+			if(!read_frame())
+				break;
+		}
+
 	}
 
 	return 0;

@@ -20,7 +20,7 @@ struct client
 };
 
 // Network globals
-static int sock_fd = 0;
+int sock_fd = 0;
 struct sockaddr_in si_src;
 struct client *clients = 0;
 
