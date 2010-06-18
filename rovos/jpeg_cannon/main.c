@@ -58,7 +58,7 @@ static int xioctl(int fd, int request, void *arg)
 
 void usage()
 {
-	printf("Usage: ./jpeg_cannon -d device -s server_port\n");
+	printf("Usage: ./jpeg_cannon --device camera_device --sport server_port\n");
 }
 
 void help()
