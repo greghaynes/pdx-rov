@@ -40,6 +40,8 @@ int network_init(short unsigned int port)
 		close(sock_fd);
 		return 0;
 	}
+
+	return 1;
 }
 
 void network_client_remove(struct client *client)
@@ -100,8 +102,6 @@ void network_handle_read()
 void network_broadcast(const char *data, int len)
 {
 	struct client *itr = clients;
-
-	printf("Broadcasting msg size: %i\n", len);
 
 	while(itr)
 	{

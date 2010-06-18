@@ -43,6 +43,7 @@ static void handle_sigalrm(int code)
 	else
 		cur_time_sec = tv.tv_sec;
 
+	network_check_clients();
 	alarm(1);
 }
 
@@ -96,9 +97,9 @@ int open_device(const char *device_path)
 	return 1;
 }
 
-static void process_image (const void *p)
+static void process_image (const void *p, int size)
 {
-	network_broadcast(p, strlen(p));
+	network_broadcast(p, size);
 }
 
 int init_mmap()
@@ -276,7 +277,7 @@ int read_frame(void)
 
 	assert(buf.index < n_buffers);
 
-	process_image (buffers[buf.index].start);
+	process_image(buffers[buf.index].start, buf.bytesused);
 
 	if (-1 == xioctl (device_fd, VIDIOC_QBUF, &buf))
 	{
@@ -368,9 +369,11 @@ int main(int argc, char **argv)
 	if(!start_capture())
 		exit(EXIT_FAILURE);
 
+
 	// Init network
 	if(!network_init(sport))
 		exit(EXIT_FAILURE);
+
 
 	while(1)
 	{
@@ -409,6 +412,7 @@ int main(int argc, char **argv)
 		{
 			if(!read_frame())
 				break;
+			break;
 		}
 
 	}
