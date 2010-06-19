@@ -12,6 +12,12 @@ TempView::TempView(QWidget *parent)
 	, m_conn(0)
 	, m_timer(new QTimer(this))
 {
+	m_timer->setSingleShot(false);
+	m_timer->setInterval(500);
+	connect(m_timer, SIGNAL(timeout()),
+		this, SLOT(req_update_temp()));
+	m_timer->start();
+
 	tempValLabel = new QLabel("0");
 
 	QHBoxLayout *mainHLayout = new QHBoxLayout();
@@ -55,7 +61,7 @@ void TempView::handle_command(const QString &module,
 		&& command_name == "query"
 		&& arguments["probe"].toString() == "Arm")
 	{
-		qDebug() << "Got temp response";
+		tempValLabel->setText(arguments["value"].toString());
 	}
 }
 

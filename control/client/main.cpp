@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 		mainWindow->setVisible(true);
 
 		TempView armTemp;
+		armTemp.setConnection(connection);
 		armTemp.show();
 
 		return app.exec();
