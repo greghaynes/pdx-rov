@@ -15,7 +15,8 @@ set(client_SRCS
 	rovjoystick.cpp
 	armjoystick.cpp
 	connectingdialog.cpp
-	propjoystick.cpp)
+	propjoystick.cpp
+	tempview.cpp)
 
 set(ui_SRCS)
 

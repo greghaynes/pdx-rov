@@ -1,17 +1,19 @@
-#include <QApplication>
-#include <QFileInfo>
-
-#include <iostream>
-
 #include "connectingdialog.h"
 #include "propjoystick.h"
 #include "armjoystick.h"
 #include "rovconnection.h"
 #include "mainwindow.h"
+#include "tempview.h"
 #include "joysticksmodel.h"
 
-#define PROP_JOYSTICK "/dev/input/js0"
-#define ARM_JOYSTICK "/dev/input/js1"
+#include <QApplication>
+#include <QFileInfo>
+#include <QHostAddress>
+
+#include <iostream>
+
+#define PROP_JOYSTICK "/dev/input/js1"
+#define ARM_JOYSTICK "/dev/input/js0"
 
 int main(int argc, char **argv)
 {
@@ -45,6 +47,9 @@ int main(int argc, char **argv)
 		mainWindow->joysticksModel().addJoystick(aj);
 		mainWindow->setVisible(true);
 
+		TempView armTemp;
+		armTemp.show();
+
 		return app.exec();
 	}
 	else
@@ -52,5 +57,6 @@ int main(int argc, char **argv)
 		std::cout << "Couldnt connect to ROV.\n";
 		return 1;
 	}
+
 }
 
