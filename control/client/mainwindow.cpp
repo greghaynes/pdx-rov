@@ -26,6 +26,8 @@ void MainWindow::setupToolbars()
 {
 	m_toolBar = new QToolBar(this);
 
+	m_toolBar->addAction(freezeAction);
+
 	addToolBar(Qt::TopToolBarArea, m_toolBar);
 }
 
@@ -42,5 +44,11 @@ void MainWindow::setupActions()
 	quitAction->setShortcut(QKeySequence::Close);
 	connect(quitAction, SIGNAL(triggered(bool)),
 		this, SLOT(close()));
+
+	freezeAction = new QAction("Free&ze",  this);
+	freezeAction->setCheckable(true);
+	freezeAction->setChecked(false);
+	connect(freezeAction, SIGNAL(triggered(bool)),
+		m_connection, SLOT(setFrozen(bool)));
 }
 

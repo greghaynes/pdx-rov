@@ -28,6 +28,7 @@ void RovConnection::sendCommand(const QString &module,
 	command_map.insert("arguments", arguments);
 	request.insert("command", command_map);
 	QByteArray json = json_serializer.serialize(request);
+	qDebug() << json;
 	write(json);
 	write("\n\n");
 }
@@ -35,6 +36,20 @@ void RovConnection::sendCommand(const QString &module,
 const QString &RovConnection::label() const
 {
 	return m_label;
+}
+
+bool RovConnection::frozen() const
+{
+	return m_frozen;
+}
+
+void RovConnection::setFrozen(bool value)
+{
+	if(m_frozen != value)
+	{
+		m_frozen = value;
+		emit(frozenChanged());
+	}
 }
 
 void RovConnection::dataReceived()

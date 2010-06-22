@@ -18,12 +18,8 @@ PropJoystick::PropJoystick(const QString &path,
 
 	motion_dirty = false;
 
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()),
-		this, SLOT(timeout()));
-	timer->setInterval(10);
-	timer->setSingleShot(false);
-	timer->start();
+	connect(&conn, SIGNAL(frozenChanged()),
+		this, SLOT(frozenChanged()));
 }
 
 void PropJoystick::onEvent(int type,
@@ -77,11 +73,13 @@ void PropJoystick::onEvent(int type,
 		*dir_value = value;
 		motion_dirty = true;
 	}
+
+	timeout();
 }
 
 void PropJoystick::timeout()
 {
-	if(motion_dirty)
+	if(motion_dirty && !connection().frozen())
 	{
 		QVariantMap args;
 		args.insert("forward", axisToProp(forward_axis));
@@ -93,6 +91,23 @@ void PropJoystick::timeout()
 		connection().sendCommand("propulsion", "move", args);
 		motion_dirty = false;
 	}
+}
+
+void PropJoystick::frozenChanged()
+{
+	if(connection().frozen())
+	{
+		QVariantMap args;
+		args.insert("forward", 0);
+		args.insert("strafe", 0);
+		args.insert("yaw", 0);
+		args.insert("roll", 0);
+		args.insert("ascend", 0);
+
+		connection().sendCommand("propulsion", "move", args);
+	}
+	else
+		timeout();
 }
 
 short int PropJoystick::axisToProp(short int axis)

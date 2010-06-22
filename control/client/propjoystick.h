@@ -23,6 +23,7 @@ class PropJoystick
 
 	private Q_SLOTS:
 		void timeout();
+		void frozenChanged();
 
 	private:
 		short int axisToProp(short int);

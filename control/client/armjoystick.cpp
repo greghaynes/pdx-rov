@@ -25,12 +25,6 @@ ArmJoystick::ArmJoystick(const QString &path,
 	gripper_dirty = false;
 	pauldron_dirty = false;
 
-	connect(flush_timer, SIGNAL(timeout()),
-		this, SLOT(flushChanges()));
-
-	flush_timer->setInterval(UPDATE_INTERVAL);
-	flush_timer->setSingleShot(false);
-	flush_timer->start();
 }
 
 void ArmJoystick::onEvent(int type,
@@ -62,6 +56,8 @@ void ArmJoystick::onEvent(int type,
 					break;
 			}
 	}
+
+	flushChanges();
 }
 
 void ArmJoystick::flushChanges()
@@ -112,11 +108,11 @@ void ArmJoystick::onAxisEvent(unsigned char number,
 	switch(number)
 	{
 		case 0:
-			wrist = value;
+			wrist = -value;
 			wrist_dirty = true;
 			break;
 		case 1:
-			elbow = value;
+			elbow = -value;
 			elbow_dirty = true;
 			break;
 		case 2:

@@ -26,10 +26,16 @@ class RovConnection
 
 		const QString &label() const;
 
+		bool frozen() const;
+
+	public Q_SLOTS:
+		void setFrozen(bool value);
+
 	Q_SIGNALS:
 		void receivedCommand(const QString &module,
 			const QString &command,
 			QVariantMap &arguments);
+		void frozenChanged();
 
 	private Q_SLOTS:
 		void dataReceived();
@@ -39,6 +45,7 @@ class RovConnection
 
 		QJson::Parser json_parser;
 		QJson::Serializer json_serializer;
+		bool m_frozen;
 
 };
 

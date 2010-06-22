@@ -12,8 +12,8 @@
 
 #include <iostream>
 
-#define PROP_JOYSTICK "/dev/input/js1"
-#define ARM_JOYSTICK "/dev/input/js0"
+#define PROP_JOYSTICK "/dev/input/js0"
+#define ARM_JOYSTICK "/dev/input/js1"
 
 int main(int argc, char **argv)
 {
