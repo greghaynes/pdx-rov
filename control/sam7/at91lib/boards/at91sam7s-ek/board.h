@@ -165,7 +165,7 @@
 /// LED #3 pin definition (PA3).
 #define PIN_LED_DS4   {1 << 3, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT}
 /// List of the four LED pin definitions (PA0, PA1, PA2 & PA3)
-#define PINS_LEDS   PIN_LED_DS1, PIN_LED_DS2, PIN_LED_DS3, PIN_LED_DS4
+#define PINS_LEDS   PIN_LED_DS1, PIN_LED_DS2
 
 /// Push button #0 definition (PA19).
 #define PIN_PUSHBUTTON_1    {1 << 19, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEGLITCH | PIO_PULLUP}
@@ -176,7 +176,7 @@
 /// Push button #3 definition (PA14).
 #define PIN_PUSHBUTTON_4    {1 << 14, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_DEGLITCH | PIO_PULLUP}
 /// List of all push button definitions (PA19, PA20, PA15 & PA14).
-#define PINS_PUSHBUTTONS    PIN_PUSHBUTTON_1, PIN_PUSHBUTTON_2, PIN_PUSHBUTTON_3, PIN_PUSHBUTTON_4
+#define PINS_PUSHBUTTONS    PIN_PUSHBUTTON_1, PIN_PUSHBUTTON_2
 /// Push button #1 index.
 #define PUSHBUTTON_BP1      0
 /// Push button #2 index.
