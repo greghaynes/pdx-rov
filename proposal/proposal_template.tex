@@ -1,0 +1,166 @@
+\documentclass{proposalnsf}
+\usepackage{epsfig}
+
+% NSF proposal generation template style file.
+% based on latex stylefiles  written by Stefan Llewellyn Smith and
+% Sarah Gille, with contributions from other collaborators.
+
+\newcommand{\jas}{{\it J. Atmos. Sci.}}
+\newcommand{\jpo}{{\it J. Phys. Oceanogr.}}
+\newcommand{\JPO}{{\it J. Phys. Oceanogr.}}
+\newcommand{\jfm}{{\it J. Fluid Mech.}}
+\newcommand{\jgr}{{\it J. Geophys. Res.}}
+\newcommand{\JGR}{{\it J. Geophys. Res.}}
+\newcommand{\jmr}{{\it J. Mar. Res.}}
+\newcommand{\arfm}{{\it Ann. Rev. Fluid Mech.}}
+\newcommand{\dsr}{{\it Deep-Sea Res.}}
+\newcommand{\dao}{{\it Dyn. Atmos. Oceans}}
+\newcommand{\jam}{{\it Journal of Applied Meteorology}}
+\newcommand{\phfl}{{\it Phys. Fluids}}
+\newcommand{\phfla}{{\it Phys. Fluids A}}
+\newcommand{\PhilTrans}{{\it Philosophical Transactions of the Royal Society, 
+London}}
+\newcommand{\gafd}{{\it Geophys. Astrophys. Fluid Dyn.}}
+\newcommand{\gfd}{{\it Geophys. Fluid Dyn.}}
+\newcommand{\PCE}   {{\it Physics and Chemistry of the Earth}}
+\newcommand{\PRL}   {{\it Physical Review Letters}}
+
+\newcommand{\ProgOc}{{\it Prog. Oceanography}}
+\newcommand{\WHOITR}{Woods Hole Oceanographic Institution Technical Report, WHOI-}
+\newcommand{\degrees}{$\!\!$\char23$\!$}
+\DeclareFontFamily{OT1}{psyr}{}
+\DeclareFontShape{OT1}{psyr}{m}{n}{<-> psyr}{}
+\def\times{{\fontfamily{psyr}\selectfont\char180}}
+
+
+\renewcommand{\refname}{\centerline{References cited}}
+
+% this handles hanging indents for publications
+\def\rrr#1\\{\par
+\medskip\hbox{\vbox{\parindent=2em\hsize=6.12in
+\hangindent=4em\hangafter=1#1}}}
+
+\def\baselinestretch{1}
+
+\begin{document}
+
+\begin{center}
+{\Large{\bf PSU-ROV 2011}}\\*[3mm]
+{\bf Portland State Univeristy enters into the annual MATE international underwater remote operated vehicle competition} \\*[3mm]
+
+Patrick Bledsoe, Greg Haynes, Spencer O. Krum, Arthur Aldridge, Kristine Sunnerfield,\\
+ Allan Dunham, Devin, Dan Colish, Jeff Doughty, Keith Parker, Phil Witham, Dr. Erik Sanchez
+
+\end{center}
+
+
+This is a  proposal to fund a Portland State Univeristy team to compete in the Marine Advanced Technology Education Center(MATE)
+ International Underwater Remote Operated Vehicle(UROV) competition. A team of undergraduates from Mechanical Engineering,
+ Chemistry, Computer Science, and Physics are building a UROV to compete in June of 2011. The effort is sponsored by PSU, 
+PSU Physics Dept, companies, and individuals. 2011 is the third consecutive year Portland State has sent a team to compete.
+This year's team is strong in computer programming and experience from previous years. The combination of hard work from the team and 
+support from you gives Portland State a real shot at winning this year's competition.  
+
+
+
+\ \\
+\noindent
+{\bf Intellectual Merit:}
+The design, construction, and operation of remote operated vehicles and particularly underwater remote operated vehicles is interesting
+because these vehicles are a gateway to an ever expanding frontier. Each new development in the technology behind these devices enables 
+researchers to probe deeper into the ocean or further into a cave. ROVs and UROVs are ubiquitous becasue of their utility, whether a team
+is looking at the bottom of a boat as a part of a safety check or probing a black smoker under the pacific, they are doing it with an ROV
+because it's faster, cheaper, and safer to do so. UROVs can go places where manned submarines cannot, sometimes simply because the cost 
+of deploying a manned submarine is too high.  
+\ \\
+
+\noindent
+{\bf Broader Impacts:}
+This project is a learning experience for the team members and a chance to win some accolades for Portland State. Team members learn 
+a variety of interrelated skills through this project. The realities of deadlines, interpersonal conflicts, and budgeting are learned, 
+sometimes the hard way. There is a long list of skills that will be developed, ranging from soldering and machining components to deploying 
+multi-processor closed-loop control systems. At the competiton, the team will see other team's solutions to the same problems and will be
+ given the opportunity to network with leaders from both industry and academia. 
+\renewcommand{\thepage} {B--\arabic{page}}
+
+\newpage
+
+% reset page numbering to 1.  This is helpful, since the text can only
+% be 15 pages, and reviewers will want to believe we've kept within
+% those limits
+
+\pagenumbering{arabic}
+\renewcommand{\thepage} {D--\arabic{page}}
+
+\newpage
+
+\centerline{\bf Results from Prior Competitions}
+
+\noindent
+{\bf PSU-ROV 2010}
+{\it award number} (PI); dates, total UROV cost: \$2496.06
+
+The Portland Sate Univeristy ROV team for the 2010 season sent 5 students and 2 mentors to Hilo, Hawaii where the team successfuly tested their craft. The 2010 ROV
+recieved 70/300 mission points and 216/500 total score.
+
+\ \\
+\noindent
+{\bf PSU-ROV 2009}
+{\it award number} (PI); dates, total UROV cost\$481.10
+The Portland State University ROV team for the 2009 season sent 3 students and 1 mentor to Boston, Mass. where the craft did not pass the safety inspection.
+The craft recieved 0/300 mission points and an 80.67/500 total score. 
+
+
+\ \\
+\noindent{\Large \bf PROJECT DESCRIPTION}
+
+\section{Introduction}
+
+Each year the MATE center hosts an underwater remote operated vehicle competition. There are two classes, one targeted at high schools and 
+the other targeted at colleges and universities. The latter is called the Explorer class and is the class that PDX-ROV competes in. MATE 
+publishes a list of missions and teams build UROV's specificially to complete these missions. MATE has not yet published the missions for 2011
+ but some things are always the same. The competition will take place in a pool; in the 2011 season the pool is the neutral boyancy lab
+operated by NASA in Houston, TX. The UROV and all its control equipment must be powered from a supplied 48 volt DC power supply rated 
+up to 40 amps. The team will be racing the clock, 5 minutes to set up, 15 minutes in pool, and 5 minute clean up. The operators will not 
+be allowed to see the pool durring the mission run; all control of the UROV must be done through the sensors the team has installed in the UROV. 
+
+\section{Mission}
+
+MATE has not yet published the 2011 Mission objectives. Here is what we do know:
+\begin{itemize}
+\item The mission is taking place in June of 2011.
+\item It will be in Houston, in the pool NASA uses to train astronauts to work in zero g, ~40ft deep
+\item The 2010 mission objectives were published in late November, 2009
+\end{itemize}
+It's really not a lot of information. The team is therefore working on things that aren't mission specific such as thrusters, gyroscopes, control loops, sponsorship, etc.
+
+
+\section{Design}
+Portland State aims to win the 2011 MATE underwater ROV competition in June. One of the biggest components of that goal is a world-class design. We plan to use the best underwater thrusters available: 3 phase brushless motors running on 24 volts in an H-bridge configuration. The 24 volt power will be drawn from synchronous buck regulator boards that will be fed 48V DC. The regulator board(s) will be on the ROV meaning our tether will carry 48 volt power instead of some lower voltage, reducing power lost as heat. We have a design that uses 6 thrusters and gives complete control over the ROV’s position in space to the operator; that is the ROV is capable of translation along the x, y, and z axes, and capable of rotation about the x, y, and z axes. Because we will have low power loss in the tether and in voltage level conversion, and because we are procuring the best available thrusters, we expect the ROV to have incredible speed, maneuverability, and thrust. The ROV will be controlled by a laptop computer running custom multi-platform software and will communicate with this computer using the RS232 serial protocol. The ROV will have an ARM microprocessor which will read and write to the controlling laptop, microcontrollers, and sensors. The sensors are one gyroscope and three monodirectional accelerometers, these sensors are externally powered and communicate with the ARM board via SPI. The microcontrollers are externally powered and communicate with the ARM board over RS232. They have 10bit analog to digital(ATD) conversion for mission specific sensing and about 8 pulse width modulated(PWM) signal pins which will be used to control the H bridges to control the thrusters. The ARM board will be running a closed-loop control system, listening to the gyroscope and activating the thrusters to hold the ROV in position. The controlling laptop will issue higher order commands in the form of vectors to the ARM board. The advantage to this scheme over a total control by the user scheme is it enables the ROV to hold position against a current or maintain a certain depth even as it takes on ballast.
+\section{Yet Another Section}
+
+\section{Time Line and Management Plan}
+
+Hmm.. Patrick do this part!
+
+\section{Summary:  Significance of proposed work}
+
+\subsection{Intellectual Merit}
+
+\subsection{Broader Impacts}
+
+
+
+\newpage
+\pagenumbering{arabic}
+\renewcommand{\thepage} {E--\arabic{page}}
+
+\bibliography{draft}
+\bibliographystyle{jponew}
+
+\newpage
+\pagenumbering{arabic}
+\renewcommand{\thepage} {G--\arabic{page}}
+\noindent{\Large \bf BUDGET JUSTIFICATION}
+
+\end{document}
